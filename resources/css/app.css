@@ -1,0 +1,332 @@
+/* ================================================
+   MOVIE TALKS - MY LIST PAGE STYLESHEET
+   Enhanced version with optimizations and clarity
+================================================ */
+
+/* ========== CSS VARIABLES ========== */
+:root {
+    --dark-bg: #0c0c14;
+    --darker-bg: #070710;
+    --card-bg: #161626;
+    --card-hover: #1d1d33;
+    --accent: #ff2a6d;
+    --accent-hover: #ff4d85;
+    --secondary: #05d9e8;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3cc;
+    --border: #2a2a3a;
+    --rating: #ffc107;
+    --transition: all 0.3s ease;
+}
+
+/* ========== BASE STYLES ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+/* Layout helpers */
+.container {
+    width: 98%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ========== MY LIST SECTION ========== */
+.my-list-header {
+    margin-top: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.my-list-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.sort-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sort-group select {
+    padding: 5px 12px;
+    border-radius: 4px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+/* ========== MOVIE CARDS ========== */
+.movie-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+    transition: var(--transition);
+    width: 100%;
+}
+
+.movie-card:hover {
+    background: var(--card-hover);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card-image {
+    position: relative;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+}
+
+.card-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--accent);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.card-content {
+    padding: 15px;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.card-meta {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+}
+
+.card-meta span {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.card-rating {
+    color: var(--rating);
+}
+
+.card-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+
+/* Progress Section */
+.progress-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    background: var(--border);
+    border-radius: 12px;
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress {
+    background: var(--accent);
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+/* Movie Actions */
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.card-actions a {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1rem;
+    color: var(--text-primary);
+    padding: 6px 14px;
+    border-radius: 30px;
+    background: var(--card-bg);
+    transition: var(--transition);
+}
+
+.card-actions a:hover {
+    background: var(--accent-hover);
+}
+
+.card-actions i {
+    font-size: 1.2rem;
+}
+
+/* Overlay for action buttons */
+.card-actions-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.card-actions-overlay button,
+.card-actions-overlay .remove-btn {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 6px 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.card-actions-overlay button:hover,
+.card-actions-overlay .remove-btn:hover {
+    background: var(--accent-hover);
+}
+
+/* ========== STATS SECTION ========== */
+.stats-section {
+    margin-top: 40px;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.stat-item {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 8px;
+    width: 30%;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+/* ========== LOADING SPINNER ========== */
+.loading-spinner {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 20px;
+    font-size: 1.2rem;
+}
+
+.loading-spinner i {
+    margin-right: 8px;
+}
+
+/* ========== MOBILE RESPONSIVENESS ========== */
+@media (max-width: 1024px) {
+    .movie-card {
+        flex-direction: column;
+    }
+
+    .card-image {
+        height: 250px;
+    }
+
+    .card-content {
+        padding: 10px;
+    }
+
+    .card-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .stats-container {
+        flex-direction: column;
+    }
+
+    .stat-item {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .my-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .sort-group {
+        margin-top: 10px;
+    }
+
+    .card-title {
+        font-size: 1.3rem;
+    }
+
+    .card-meta,
+    .card-description {
+        font-size: 0.9rem;
+    }
+
+    .card-actions a {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+    }
+}
