@@ -99,14 +99,20 @@
                             <div style="font-weight: 600;">{{ $data->title }}</div>
                             <div style="font-size: 13px; color: #777;">{{ $data->director }}</div>
                         </td>
-<td>{{ implode(', ', $data->category_names) }}</td>
+                        <td>{{ implode(', ', $data->category_names) }}</td>
                         
                         <td>{{ $data->release_date }}</td>
-                        <td>
-                            <span class="rating-badge">
-                                <i class="fas fa-star"></i> {{ $data->rating }}
-                            </span>
-                        </td>
+
+
+                     <td>
+                        <span class="rating-badge">
+                            <i class="fas fa-star"></i> 
+                            {{ $data->average_rating ?? '0.00' }}
+                        </span>
+                    </td>
+
+
+
                         <td><span class="status-badge status-active">{{ $data->status }}</span></td>
                         <td>
 

@@ -71,34 +71,7 @@ class MovieController extends Controller
      * @param int $movieId
      * @return \Illuminate\View\View
      */
-    public function show($movieId)
-    {
-        // Get the movie details
-        $movie = Movie::with('category')->findOrFail($movieId);
-        $userrating = Rating::where('user_id', Auth::id());
-$userrating = Rating::where('movie_id', $movie->id)
-                    ->where('user_id', auth()->id())
-                    ->value('rating'); // this will return the user's previous rating
-        // Get user reviews for the movie
-        //  $reviews = $movie->reviews()->with('user')->latest()->get();
-$rating = Rating::where('movie_id', $movieId)->avg('rating');
-        // Get similar movies based on the same category
-        $similarMovies = Movie::where('category_id', $movie->category_id)
-            ->where('id', '!=', $movieId)
-            ->orderBy('rating', 'desc')
-            ->take(4)
-            ->get();
-
-        // Check if the movie is in the user's watchlist
-        $inWatchlist = false;
-        if (Auth::check()) {
-            $inWatchlist = Watchlist::where('user_id', Auth::id())
-                ->where('movie_id', $movieId)
-                ->exists();
-        }
-
-        return view('user.moviedetail', compact('movie', 'similarMovies','rating', 'inWatchlist','userrating'));
-    }
+  
 public function search(Request $request)
     {
         // Get search term from the request
@@ -222,7 +195,10 @@ public function search(Request $request)
     //this is backend movies view
 public function moviesdata()
 {
-    $movies = Movie::orderBy('id', 'desc')->get();
+    // Fetch movies with avg rating and order by latest
+    $movies = \App\Models\Movie::withAvg('ratings', 'rating')
+        ->orderBy('id', 'desc')
+        ->get();
 
     foreach ($movies as $movie) {
         // Convert "3,4,5" into [3,4,5]
@@ -231,12 +207,18 @@ public function moviesdata()
         // Fetch category names from DB
         $names = \App\Models\Category::whereIn('id', $ids)->pluck('name')->toArray();
 
-        // Add as extra property
+        // Add category names as extra property
         $movie->category_names = $names;
+
+        // Add rating as short variable
+        $movie->average_rating = $movie->ratings_avg_rating
+            ? number_format($movie->ratings_avg_rating, 2)
+            : null;
     }
 
     return view('admin.adminblade.movies', compact('movies'));
 }
+
 
 
 //this is backend addmovies 
@@ -251,8 +233,7 @@ public function insertmovies(Request $request)
         'director'       => 'nullable|string|max:255',
         'content_rating' => 'nullable|string|max:50',
         'writer'         => 'nullable|string|max:255',
-        'production'     => 'nullable|string|max:255',
-        'genres'         => 'required|array',          // expecting array from form
+        'production'     => 'nullable|string|max:255',          
         'cast'           => 'nullable|string',
         'poster'         => 'required|image|mimes:jpg,jpeg,png|max:2048', // poster must be image
         'trailer'        => 'nullable|url',
@@ -272,7 +253,6 @@ public function insertmovies(Request $request)
     $movie->production     = $request->production;
 
     // store genres as comma separated
-    $movie->genres = implode(',', $request->genres); 
     $movie->category_id =  $request->category; // if you are mapping to categories
 
     $movie->cast = $request->cast;
@@ -381,12 +361,46 @@ public function selectedmoviereview($id){
         $movie = Movie::findOrFail($id);
         $reviews = Review::where('movie_id', $id)->latest()->get();
 
+        
+
         return view('admin.adminblade.reviewshow', compact('movie', 'reviews'));
     }
 
 
 
-   public function rating($id, Request $request)
+
+
+  public function show($movieId)
+    {
+        // Get the movie details
+        $movie = Movie::with('category')->findOrFail($movieId);
+        $userrating = Rating::where('user_id', Auth::id());
+        $userrating = Rating::where('movie_id', $movie->id)
+                    ->where('user_id', auth()->id())
+                    ->value('rating'); // this will return the user's previous rating
+        // Get user reviews for the movie
+        //  $reviews = $movie->reviews()->with('user')->latest()->get();
+        $rating = Rating::where('movie_id', $movieId)->avg('rating');
+        // Get similar movies based on the same category
+        $similarMovies = Movie::where('category_id', $movie->category_id)
+            ->where('id', '!=', $movieId)
+            ->orderBy('rating', 'desc')
+            ->take(4)
+            ->get();
+
+        // Check if the movie is in the user's watchlist
+        $inWatchlist = false;
+        if (Auth::check()) {
+            $inWatchlist = Watchlist::where('user_id', Auth::id())
+                ->where('movie_id', $movieId)
+                ->exists();
+        }
+
+        return view('user.moviedetail', compact('movie', 'similarMovies','rating', 'inWatchlist','userrating'));
+    }
+
+
+       public function rating($id, Request $request)
 {
     $movieId = $id;
 
@@ -405,6 +419,7 @@ public function selectedmoviereview($id){
             ]
         );
 
+      
     return back()->with('success', 'Rating submitted successfully.');
 }
 

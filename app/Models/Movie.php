@@ -18,7 +18,6 @@ protected $table = 'movies';
 'content_rating',
 'writer',
 'production',
-'genres',
 'cast',
 'poster',
 'trailer_url',

@@ -44,4 +44,10 @@ class Review extends Model
     {
         return $this->belongsTo(Movie::class);
     }
+
+    public function ratings()
+{
+    return $this->hasMany(\App\Models\Rating::class);
+}
+
 }

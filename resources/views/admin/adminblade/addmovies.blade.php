@@ -102,16 +102,17 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Genres</label>
-                        <div class="checkbox-group">
-                            @foreach ($generes as $item)
-                                <label>
-                                    <input type="checkbox" name="genres[]" value="{{ $item->id }}"> {{ $item->name }}
-                                </label>
-                            @endforeach
+                         <div class="form-group">
+                            <label for="category" class="form-label">Category</label>
+                            <select name="category" id="category" class="form-select" required>
+                                <option value="">Select Category</option>
+                               @foreach ($generes as $item)
+                            <option value="{{ $item->id }}">
+                                {{ $item->name }}
+                            </option>
+                        @endforeach                              
+                            </select>
                         </div>
-                    </div>
 
                     <div class="form-row">
                         <div class="form-group">
@@ -139,26 +140,14 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
+                    
                     <div class="form-group">
                         <label for="trailer" class="form-label">Trailer URL (YouTube)</label>
                         <input type="url" name="trailer" id="trailer" class="form-input" placeholder="https://www.youtube.com/watch?v=..." required>
                     </div>
 
-                    <div class="form-group">
-                            <label for="category" class="form-label">Category</label>
-                            <select name="category" id="category" class="form-select" required>
-                                <option value="">Select Category</option>
-                               @foreach ($generes as $item)
-                            <option value="{{ $item->id }}">
-                                {{ $item->name }}
-                            </option>
-                        @endforeach
-
-                              
-                            </select>
-                        </div>
-                    </div>
+                
+                   
                     <div class="form-actions">
                         <button type="reset" class="btn btn-secondary">Cancel</button>
                         <button type="submit" class="btn btn-primary">Add Movie</button>
