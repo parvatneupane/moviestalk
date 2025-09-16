@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\MyListController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReviewController;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -43,9 +44,19 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
     Route::get('user/movies', [MovieController::class, 'index'])->name('movies');
+    
+Route::post('movierating/{id}', [MovieController::class, 'rating']);
 
-Route::post('user/movie/{movieId}/review', [MovieController::class, 'submitReview'])->name('movie.submit-review');
-Route::post('user/movie/{movieId}/rate', [MovieController::class, 'submitRating'])->name('movie.submit-rating');
+//reviews
+Route::post('/moviereview/{movieId}', [ReviewController::class, 'submitReview'])
+    ->name('movie.submit-review')
+    ->middleware('auth'); 
+
+    
+
+
+
+
 
     // Profile Routes
     Route::get('/profile', function () {
@@ -116,8 +127,9 @@ Route::post('updatemovies/{id}', [MovieController::class, 'update'])->name('movi
 
 Route::get('/deletemovies/{id}', [MovieController::class, 'destroy'])->name('movies.destroy');
 
-// Show all reviews for a movie
-Route::get('/reviews/{id}', [MovieController::class, 'selectedmoviereview'])->name('admin.movies.reviews');
+Route::get('/reviews/{id}', [MovieController::class, 'selectedmoviereview']);
+
+
 
 
 });
@@ -130,5 +142,3 @@ Route::post('/addgenres', [CategoryController::class, 'insertgenres']);
 Route::delete('/genres/{id}', [CategoryController::class, 'deleteGenre'])->name('genres.delete');
 
 });
-
-Route::post('movierating/{id}', [MovieController::class, 'rating']);

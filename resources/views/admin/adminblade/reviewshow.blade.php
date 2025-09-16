@@ -6,10 +6,10 @@
         --primary-color: #4361ee;
         --secondary-color: #3f37c9;
         --accent-color: #f72585;
-        --bg-color: #f5f7fb; /* unchanged */
-        --card-bg: #fff; /* unchanged */
-        --text-color: #343a40; /* unchanged */
-        --subtext-color: #6c757d; /* unchanged */
+        --bg-color: #f5f7fb;
+        --card-bg: #fff;
+        --text-color: #343a40;
+        --subtext-color: #6c757d;
         --border-radius: 12px;
         --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         --transition: all 0.3s ease;
@@ -39,9 +39,8 @@
         box-shadow: 0 12px 25px rgba(0,0,0,0.08);
     }
 
-    /* Blue Header with Darkish Gradient */
     .card-header {
-        background: linear-gradient(135deg, #2c2c55, #1a1a3d); /* darkish blue */
+        background: linear-gradient(135deg, #2c2c55, #1a1a3d);
         color: #fff;
         padding: 1.5rem 2rem;
         display: flex;
@@ -85,7 +84,6 @@
         transform: translateY(-2px);
     }
 
-    /* Table Styles remain unchanged */
     .reviews-table thead th {
         background-color: #f8f9fa;
         font-weight: 600;
@@ -167,16 +165,13 @@
         .header-title, .header-center {
             text-align: center;
         }
-
         .user-info {
             flex-direction: column;
             align-items: flex-start;
         }
-
         .user-avatar {
             margin-bottom: 8px;
         }
-
         .review-text {
             max-width: 200px;
         }
@@ -187,17 +182,14 @@
     <div class="reviews-card">
         <!-- Header -->
         <div class="card-header">
-            <!-- Left: Movie Title -->
             <div class="header-title">{{ $movie->title }}</div>
 
-            <!-- Center: Total Reviews -->
             <div class="header-center">
                 <div>All Reviews</div>
                 <div class="stat-value">{{ $reviews->count() }}</div>
                 <div class="stat-label">Total Reviews</div>
             </div>
 
-            <!-- Right: Back Button -->
             <div>
                 <a href="{{ url('/admin/movies') }}" class="btn back-btn">
                     <i class="fas fa-arrow-left me-2"></i> Back
@@ -228,7 +220,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td><span class="rating-badge">{{ $review->rating }}/5</span></td>
+                            <td><span class="rating-badge">{{ $review->rating ?? '-' }}/5</span></td>
                             <td><div class="review-text">{{ $review->review }}</div></td>
                             <td>{{ $review->created_at->format('M d, Y') }}</td>
                         </tr>

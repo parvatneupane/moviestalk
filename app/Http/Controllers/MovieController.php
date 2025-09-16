@@ -139,8 +139,8 @@ public function search(Request $request)
         Review::create([
             'user_id' => Auth::id(),
             'movie_id' => $movieId,
-            'title' => $request->title,
-            'content' => $request->content,
+            
+            'review' => $request->review,
             'rating' => $request->rating,
         ]);
 
@@ -154,41 +154,6 @@ public function search(Request $request)
      * @param int $movieId
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function submitRating(Request $request, $movieId)
-    {
-        $request->validate([
-            'rating' => 'required|numeric|min:1|max:5',
-        ]);
-
-        if (!Auth::check()) {
-            return redirect()->route('user.login');
-        }
-
-        // Update or create the user's rating for the movie
-        $userRating = Review::where('user_id', Auth::id())
-            ->where('movie_id', $movieId)
-            ->first();
-
-        if ($userRating) {
-            $userRating->update(['rating' => $request->rating]);
-        } else {
-            Review::create([
-                'user_id' => Auth::id(),
-                'movie_id' => $movieId,
-                'rating' => $request->rating,
-                'title' => 'User Rating',
-                'content' => '',
-            ]);
-        }
-
-        // Update movie rating based on the average of all reviews
-        $averageRating = Review::where('movie_id', $movieId)->avg('rating');
-        $movie = Movie::findOrFail($movieId);
-        $movie->rating = $averageRating;
-        $movie->save();
-
-        return back()->with('success', 'Rating submitted successfully.');
-    }
 
 
 
@@ -356,48 +321,54 @@ public function destroy($id)
 
 //show review of particular movie
 
-    // Show reviews for a specific movie
-public function selectedmoviereview($id){
-        $movie = Movie::findOrFail($id);
-        $reviews = Review::where('movie_id', $id)->latest()->get();
+ // Show reviews for a specific movie
+// Show reviews for a specific movie 
 
+
+
+
+public function show($movieId)
+{
+    // Fetch the movie with its category and eager load reviews with user info
+    $movie = Movie::with(['category', 'reviews.user'])->findOrFail($movieId);
+
+    // Get current user's rating for this movie (if logged in)
+    $userRating = Auth::check()
+        ? Rating::where('movie_id', $movie->id)
+                ->where('user_id', Auth::id())
+                ->value('rating')
+        : null;
+
+    // Get all reviews for this movie, latest first
+    $reviews = $movie->reviews->sortByDesc('created_at');
+
+    // Calculate average rating for this movie
+    $rating = Rating::where('movie_id', $movieId)->avg('rating');
+
+    // Fetch similar movies (same category) excluding current movie
+    $similarMovies = Movie::where('category_id', $movie->category_id)
+        ->where('id', '!=', $movieId)
+        ->orderBy('rating', 'desc')
+        ->take(4)
+        ->get();
+
+    // Check if the movie is in the user's watchlist
+    $inWatchlist = Auth::check()
+        ? Watchlist::where('user_id', Auth::id())
+                   ->where('movie_id', $movieId)
+                   ->exists()
+        : false;
+
+    return view('user.moviedetail', compact(
+        'movie',
+        'similarMovies',
+        'rating',
+        'inWatchlist',
+        'userRating',
+        'reviews',
         
-
-        return view('admin.adminblade.reviewshow', compact('movie', 'reviews'));
-    }
-
-
-
-
-
-  public function show($movieId)
-    {
-        // Get the movie details
-        $movie = Movie::with('category')->findOrFail($movieId);
-        $userrating = Rating::where('user_id', Auth::id());
-        $userrating = Rating::where('movie_id', $movie->id)
-                    ->where('user_id', auth()->id())
-                    ->value('rating'); // this will return the user's previous rating
-        // Get user reviews for the movie
-        //  $reviews = $movie->reviews()->with('user')->latest()->get();
-        $rating = Rating::where('movie_id', $movieId)->avg('rating');
-        // Get similar movies based on the same category
-        $similarMovies = Movie::where('category_id', $movie->category_id)
-            ->where('id', '!=', $movieId)
-            ->orderBy('rating', 'desc')
-            ->take(4)
-            ->get();
-
-        // Check if the movie is in the user's watchlist
-        $inWatchlist = false;
-        if (Auth::check()) {
-            $inWatchlist = Watchlist::where('user_id', Auth::id())
-                ->where('movie_id', $movieId)
-                ->exists();
-        }
-
-        return view('user.moviedetail', compact('movie', 'similarMovies','rating', 'inWatchlist','userrating'));
-    }
+    ));
+}
 
 
        public function rating($id, Request $request)

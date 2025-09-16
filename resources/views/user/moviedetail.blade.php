@@ -74,78 +74,163 @@
             </div>
         </div>
 
-        @auth
-        <!-- Ratings Section -->
-        <div class="rating-container">
-            <div class="user-rating">
-    <h3>Your Rating</h3>
-    <form id="rating-form" action="{{ url('movierating/' . $movie->id ) }}" method="POST">
-        @csrf
-        <div class="star-rating">
-            @for($i=1; $i<=5; $i++)
-                <label>
-                    <input type="radio" name="rating" value="{{ $i }}"
-                        {{ (!empty($userrating) && $userrating == $i) ? 'checked' : '' }}> 
-                    <i class="fas fa-star"></i>
-                </label>
-            @endfor
-        </div>
-        <button type="submit" class="rating-submit">Submit Rating</button>
-    </form>
-</div>
+   @auth
+<div class="rating-container">
 
-
-            <div class="rating-stars">
-    @for($i = 1; $i <= 5; $i++)
-        @if($i <= floor($rating))
-            <i class="fas fa-star"></i> <!-- Full star -->
-        @elseif($i - 0.5 <= $rating)
-            <i class="fas fa-star-half-alt"></i> <!-- Half star -->
-        @else
-            <i class="far fa-star"></i> <!-- Empty star -->
-        @endif
+    <!-- User Rating Form -->
+    <div class="user-rating">
+        <h3>Your Rating</h3>
+        <form id="rating-form" action="{{ url('movierating/' . $movie->id) }}" method="POST">
+            @csrf
+          <div class="star-rating">
+    @for ($i = 1; $i <= 5; $i++)
+        <label>
+            <input type="radio" name="rating" value="{{ $i }}"
+                @if(!empty($userRating) && $userRating == $i) checked @endif>
+            <i class="fas fa-star"></i>
+        </label>
     @endfor
 </div>
 
-        </div>
-        @endauth
+            <button type="submit" class="rating-submit">Submit Rating</button>
+        </form>
     </div>
+
+    <!-- Display Average Rating -->
+    <div class="rating-stars mt-3">
+        @for ($i = 1; $i <= 5; $i++)
+            @if ($i <= floor($rating))
+                <i class="fas fa-star"></i>
+            @elseif ($i - 0.5 <= $rating)
+                <i class="fas fa-star-half-alt"></i>
+            @else
+                <i class="far fa-star"></i>
+            @endif
+        @endfor
+        <span class="average-rating">{{ number_format($rating, 1) }}/5</span>
+    </div>
+
+</div>
+@endauth
+<style>
+    .star-rating {
+    display: flex;
+    flex-direction: row; /* left to right */
+}
+
+.star-rating input {
+    display: none; /* hide radio buttons */
+}
+
+.star-rating i {
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: color 0.2s;
+}
+
+.star-rating i.filled {
+    color: #f5b301; /* selected/highlight color */
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const stars = document.querySelectorAll('.star-rating label i');
+    const radios = document.querySelectorAll('.star-rating input');
+
+    // Function to fill stars up to rating
+    function fillStars(rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('filled');
+            } else {
+                star.classList.remove('filled');
+            }
+        });
+    }
+
+    // On page load, fill stars for previously selected rating
+    const checkedRadio = document.querySelector('.star-rating input:checked');
+    if (checkedRadio) {
+        fillStars(parseInt(checkedRadio.value));
+    }
+
+    stars.forEach((star, index) => {
+        const radio = radios[index];
+
+        // Hover effect
+        star.parentElement.addEventListener('mouseenter', () => {
+            fillStars(index + 1);
+        });
+
+        star.parentElement.addEventListener('mouseleave', () => {
+            const checked = document.querySelector('.star-rating input:checked');
+            fillStars(checked ? parseInt(checked.value) : 0);
+        });
+
+        // Click selects rating
+        star.parentElement.addEventListener('click', () => {
+            radio.checked = true;
+            fillStars(index + 1);
+        });
+    });
+});
+</script>
+
+
 </section>
 
 <main class="container">
-    <!-- Reviews Section -->
-    <section class="reviews-section">
-        <h2 class="section-title">User Reviews</h2>
+<!-- Reviews Section -->
+<!-- Reviews Section -->
+<section class="reviews-section">
+    <h2 class="section-title">User Reviews</h2>
 
-        @auth
-        <div class="review-form">
-            <form method="POST" action="{{ route('movie.submit-review', $movie->id) }}">
-                @csrf
-                <input type="text" name="title" placeholder="Review title" required>
-                <textarea name="content" placeholder="Write your review..." required></textarea>
-                <button type="submit">Submit Review</button>
-            </form>
-        </div>
-        @else
-        <p>Please <a href="{{ route('user.login.form') }}">login</a> to write a review.</p>
-        @endauth
+    @auth
+    <div class="review-form">
+        <form method="POST" action="{{ route('movie.submit-review', $movie->id) }}">
+            @csrf
 
-        {{-- <div class="reviews-list">
-            @forelse($reviews as $review)
-            <div class="review-card">
-                <div class="review-header">
+            <textarea 
+                name="review" 
+                placeholder="Write your review..." 
+                required 
+                rows="4"
+                class="form-control"
+            >{{ old('review') }}</textarea>
+
+            @error('review')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+
+            <button type="submit" class="btn btn-primary mt-2">Submit Review</button>
+        </form>
+    </div>
+    @else
+    <p>Please <a href="{{ route('user.login.form') }}">login</a> to write a review.</p>
+    @endauth
+
+    <!-- Display Reviews -->
+    <div class="reviews-list mt-4">
+        @forelse($reviews as $review)
+            <div class="review-card border p-3 mb-3 rounded">
+                <div class="review-header mb-2">
                     <strong>{{ $review->user->name }}</strong>
-                    <span>{{ $review->created_at->format('F j, Y') }}</span>
+                    <span class="text-muted">{{ $review->created_at->format('F j, Y') }}</span>
                 </div>
                 <div class="review-content">
-                    <p>{{ $review->content }}</p>
+                    <p>{{ $review->review }}</p>
                 </div>
             </div>
-            @empty
+        @empty
             <p>No reviews yet.</p>
-            @endforelse
-        </div> --}}
-    </section>
+        @endforelse
+    </div>
+</section>
+
 
     <!-- Similar Movies -->
     <section class="similar-movies">
