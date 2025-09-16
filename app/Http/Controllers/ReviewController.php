@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Movie;
 use Illuminate\Http\Request;
 use App\Models\Review;
 
@@ -45,19 +45,21 @@ public function submitReview(Request $request, $movieId)
 
     return redirect()->back()->with('success', 'Review submitted successfully!');
 }
- //admin review show
+ //admin review shownamespace App\Http\Controllers;
+
+
     public function selectedmoviereview($id)
     {
-        // Get the movie
+        // Find the movie
         $movie = Movie::findOrFail($id);
 
-        // Get related reviews with user info
+        // Fetch reviews for that movie, including user info
         $reviews = Review::with('user')
                         ->where('movie_id', $id)
                         ->latest()
                         ->get();
 
-        // Send to your Blade file
+        // Reuse your styled admin blade
         return view('admin.adminblade.reviewshow', compact('movie', 'reviews'));
     }
 
