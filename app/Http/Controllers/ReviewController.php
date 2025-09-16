@@ -45,8 +45,21 @@ public function submitReview(Request $request, $movieId)
 
     return redirect()->back()->with('success', 'Review submitted successfully!');
 }
+ //admin review show
+    public function selectedmoviereview($id)
+    {
+        // Get the movie
+        $movie = Movie::findOrFail($id);
 
+        // Get related reviews with user info
+        $reviews = Review::with('user')
+                        ->where('movie_id', $id)
+                        ->latest()
+                        ->get();
 
+        // Send to your Blade file
+        return view('admin.adminblade.reviewshow', compact('movie', 'reviews'));
+    }
 
 
 

@@ -394,4 +394,8 @@ public function show($movieId)
     return back()->with('success', 'Rating submitted successfully.');
 }
 
+
+  
+
+
 }
