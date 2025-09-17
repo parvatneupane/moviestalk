@@ -132,8 +132,8 @@ Route::post('updatemovies/{id}', [MovieController::class, 'update'])->name('movi
 
 Route::get('/deletemovies/{id}', [MovieController::class, 'destroy'])->name('movies.destroy');
 
-Route::get('/reviews/{id}', [MovieController::class, 'selectedmoviereview']);
 
+Route::get('/reviews/{id}', [ReviewController::class, 'selectedmoviereview']);
 
 
 
