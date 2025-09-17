@@ -59,8 +59,6 @@ Route::post('/movies/{movieId}/review/update', [MovieController::class, 'updateR
 
 
 
-
-
     // Profile Routes
     Route::get('/profile', function () {
         return view('profile');
@@ -147,3 +145,13 @@ Route::post('/addgenres', [CategoryController::class, 'insertgenres']);
 Route::delete('/genres/{id}', [CategoryController::class, 'deleteGenre'])->name('genres.delete');
 
 });
+
+
+Route::middleware('auth')->group(function(){
+    Route::get('/movies/{movie}/check-review', [ReviewController::class, 'checkReview'])
+         ->name('movie.check-review');
+
+    Route::post('/movies/{movie}/submit-review', [ReviewController::class, 'submitReview'])
+         ->name('movie.submit-review');
+});
+

@@ -123,29 +123,7 @@ public function search(Request $request)
      * @param int $movieId
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function submitReview(Request $request, $movieId)
-    {
-        $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required',
-            'rating' => 'required|numeric|min:1|max:5',
-        ]);
-
-        if (!Auth::check()) {
-            return redirect()->route('user.login');
-        }
-
-        // Create a new review for the movie
-        Review::create([
-            'user_id' => Auth::id(),
-            'movie_id' => $movieId,
-            
-            'review' => $request->review,
-            'rating' => $request->rating,
-        ]);
-
-        return back()->with('success', 'Review submitted successfully.');
-    }
+  
 
     /**
      * Submit or update the rating for a movie.
@@ -387,31 +365,33 @@ public function destroy($id)
 
 
 
-       public function rating($id, Request $request)
+public function rating($id, Request $request)
 {
-    $movieId = $id;
+    $request->validate([
+        'rating' => 'required|numeric|min:1|max:5'
+    ]);
 
-    // Create a new rating record
-   $request->validate([
-            'rating' => 'required|numeric|min:0|max:5'
-        ]);
+    Rating::updateOrCreate(
+        [
+            'user_id' => auth()->id(),
+            'movie_id' => $id
+        ],
+        [
+            'rating' => $request->rating
+        ]
+    );
 
-         Rating::updateOrCreate(
-            [
-                'user_id'  => auth()->id(),
-                'movie_id' => $movieId
-            ],
-            [
-                'rating' => $request->rating
-            ]
-        );
+    // Get updated average rating
+    $averageRating = Rating::where('movie_id', $id)->avg('rating');
 
-      
-    return back()->with('success', 'Rating submitted successfully.');
+    return response()->json([
+        'success' => true,
+        'rating' => $request->rating,
+        'averageRating' => $averageRating
+    ]);
 }
 
 
-  
 
 
 }

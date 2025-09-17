@@ -82,48 +82,26 @@
     <!-- User Rating Form -->
     <div class="user-rating">
         <h3>Your Rating</h3>
-        <form id="rating-form" action="{{ url('movierating/' . $movie->id) }}" method="POST">
-            @csrf
-          <div class="star-rating">
-    @for ($i = 1; $i <= 5; $i++)
-        <label>
-            <input type="radio" name="rating" value="{{ $i }}"
-                @if(!empty($userRating) && $userRating == $i) checked @endif>
-            <i class="fas fa-star"></i>
-        </label>
-    @endfor
-</div>
-
-            <button type="submit" class="rating-submit">Submit Rating</button>
-        </form>
-    </div>
-
-    <!-- Display Average Rating -->
-    <div class="rating-stars mt-3">
+<form id="rating-form" action="{{ url('movierating/' . $movie->id) }}" method="POST">
+    @csrf
+    <div class="star-rating">
         @for ($i = 1; $i <= 5; $i++)
-            @if ($i <= floor($rating))
+            <label>
+                <input type="radio" name="rating" value="{{ $i }}"
+                    @if(!empty($userrating) && $userrating == $i) checked @endif>
                 <i class="fas fa-star"></i>
-            @elseif ($i - 0.5 <= $rating)
-                <i class="fas fa-star-half-alt"></i>
-            @else
-                <i class="far fa-star"></i>
-            @endif
+            </label>
         @endfor
-        <span class="average-rating">{{ number_format($rating, 1) }}/5</span>
     </div>
+    <button type="submit" class="rating-submit">Submit Rating</button>
+</form>
 
-</div>
-@endauth
 <style>
-    .star-rating {
+.star-rating {
     display: flex;
-    flex-direction: row; /* left to right */
+    flex-direction: row;
 }
-
-.star-rating input {
-    display: none; /* hide radio buttons */
-}
-
+.star-rating input { display: none; }
 .star-rating i {
     font-size: 24px;
     color: #ccc;
@@ -131,56 +109,153 @@
     margin-right: 5px;
     transition: color 0.2s;
 }
-
-.star-rating i.filled {
-    color: #f5b301; /* selected/highlight color */
-}
-
+.star-rating i.filled { color: #f5b301; }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const stars = document.querySelectorAll('.star-rating label i');
     const radios = document.querySelectorAll('.star-rating input');
 
-    // Function to fill stars up to rating
     function fillStars(rating) {
         stars.forEach((star, index) => {
-            if (index < rating) {
-                star.classList.add('filled');
-            } else {
-                star.classList.remove('filled');
-            }
+            star.classList.toggle('filled', index < rating);
         });
     }
 
-    // On page load, fill stars for previously selected rating
+    // Fill stars for previously selected rating
     const checkedRadio = document.querySelector('.star-rating input:checked');
-    if (checkedRadio) {
-        fillStars(parseInt(checkedRadio.value));
-    }
+    if (checkedRadio) fillStars(parseInt(checkedRadio.value));
 
     stars.forEach((star, index) => {
         const radio = radios[index];
 
-        // Hover effect
-        star.parentElement.addEventListener('mouseenter', () => {
-            fillStars(index + 1);
-        });
-
+        star.parentElement.addEventListener('mouseenter', () => fillStars(index + 1));
         star.parentElement.addEventListener('mouseleave', () => {
             const checked = document.querySelector('.star-rating input:checked');
             fillStars(checked ? parseInt(checked.value) : 0);
         });
 
-        // Click selects rating
         star.parentElement.addEventListener('click', () => {
             radio.checked = true;
             fillStars(index + 1);
         });
     });
+
+    // AJAX form submission
+    const form = document.getElementById('rating-form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        if (!rating) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Please select a rating first!',
+                background: '#2d2d2d',
+                color: '#ffffff',
+                iconColor: '#f44336'
+            });
+            return;
+        }
+
+        fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ rating: rating })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Update user stars instantly
+                fillStars(parseInt(data.rating));
+
+                // Update average rating visually
+                const avgRatingContainer = document.getElementById('average-rating');
+                const avg = parseFloat(data.averageRating);
+
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= Math.floor(avg)) {
+                        starsHtml += '<i class="fas fa-star"></i>';
+                    } else if (i - 0.5 <= avg) {
+                        starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                    } else {
+                        starsHtml += '<i class="far fa-star"></i>';
+                    }
+                }
+                starsHtml += ` <span class="average-rating">${avg.toFixed(1)}/5</span>`;
+                avgRatingContainer.innerHTML = starsHtml;
+
+                // SweetAlert dark theme popup
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Rating submitted successfully',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    background: '#2d2d2d',
+                    color: '#ffffff',
+                    iconColor: '#f5b301'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong!',
+                    background: '#2d2d2d',
+                    color: '#ffffff',
+                    iconColor: '#f44336'
+                });
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Something went wrong!',
+                background: '#2d2d2d',
+                color: '#ffffff',
+                iconColor: '#f44336'
+            });
+        });
+    });
 });
 </script>
+
+
+
+
+
+
+    </div>
+
+    <!-- Display Average Rating -->
+<div class="rating-stars mt-3" id="average-rating">
+    @for ($i = 1; $i <= 5; $i++)
+        @if ($i <= floor($rating))
+            <i class="fas fa-star"></i>
+        @elseif ($i - 0.5 <= $rating)
+            <i class="fas fa-star-half-alt"></i>
+        @else
+            <i class="far fa-star"></i>
+        @endif
+    @endfor
+    <span class="average-rating">{{ number_format($rating, 1) }}/5</span>
+</div>
+
+
+</div>
+@endauth
+
 
 
 </section>
@@ -192,25 +267,99 @@ document.addEventListener('DOMContentLoaded', () => {
     <h2 class="section-title">User Reviews</h2>
 
     @auth
-    <div class="review-form">
-        <form method="POST" action="{{ route('movie.submit-review', $movie->id) }}">
-            @csrf
+ 
+<div class="review-form">
+    <textarea 
+        id="review-text"
+        placeholder="Write your review..." 
+        rows="4"
+        class="form-control"
+    >{{ old('review') }}</textarea>
 
-            <textarea 
-                name="review" 
-                placeholder="Write your review..." 
-                required 
-                rows="4"
-                class="form-control"
-            >{{ old('review') }}</textarea>
+    <button type="button" id="submit-review" class="btn btn-primary mt-2">Submit Review</button>
+</div>
 
-            @error('review')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
 
-            <button type="submit" class="btn btn-primary mt-2">Submit Review</button>
-        </form>
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('submit-review').addEventListener('click', function() {
+    let reviewText = document.getElementById('review-text').value.trim();
+
+    if(!reviewText){
+        Swal.fire({
+            title: 'Error',
+            text: 'Please write a review first!',
+            icon: 'error',
+            background: '#1e1e1e',
+            color: '#fff',
+            confirmButtonColor: '#3085d6'
+        });
+        return;
+    }
+
+    // Check if review already exists
+    fetch("{{ route('movie.check-review', $movie->id) }}")
+    .then(res => res.json())
+    .then(data => {
+        if(data.exists){
+            // Confirmation alert (dark theme)
+            Swal.fire({
+                title: "Update Review?",
+                text: "You already submitted a review. Do you want to update it?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, update it",
+                cancelButtonText: "No, keep old",
+                background: '#1e1e1e',
+                color: '#fff',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33'
+            }).then(result => {
+                if(result.isConfirmed){
+                    submitReview(reviewText, true);
+                }
+            });
+        } else {
+            submitReview(reviewText, false);
+        }
+    });
+});
+
+// AJAX function to submit or update review
+function submitReview(review, update){
+    fetch("{{ route('movie.submit-review', $movie->id) }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type':'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            review: review,
+            update: update
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        Swal.fire({
+            title: data.success ? 'Success' : 'Error',
+            text: data.message,
+            icon: data.success ? 'success' : 'error',
+            background: '#1e1e1e',
+            color: '#fff',
+            confirmButtonColor: data.success ? '#3085d6' : '#d33'
+        }).then(() => {
+            if(data.success) location.reload(); // refresh to show updated review
+        });
+    });
+}
+</script>
+
+
+
+</div>
+
+
+
     @else
     <p>Please <a href="{{ route('user.login.form') }}">login</a> to write a review.</p>
     @endauth
@@ -254,4 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 @push('scripts')
 <script src="{{ asset('js/moviedetail.js') }}"></script>
+
+
 @endpush

@@ -20,10 +20,10 @@ class DashboardController extends Controller
 
     $users = User::count();
     $movies = Movie::count();
-    //$reviews = Review::count();  // if you have a Review model
+    $reviews = Review::count();  // if you have a Review model
     $user = Auth::user();
 
-    return view('admin.adminblade.dashboard', compact('users', 'movies', 'user'));
+    return view('admin.adminblade.dashboard', compact('users', 'movies', 'user', 'reviews'));
 }
 
 
