@@ -1,4 +1,4 @@
-@extends('admin.adminlayout')
+@extends('layouts.admin')
 
     
 
@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieTalk Admin - Users</title>
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('admincss/users.css') }}">
+    <link rel="stylesheet" href="{{ asset('admincss/upadtemovies.css') }}">
 </head>
 
 
@@ -164,7 +164,7 @@
 </head>
 
 
-@section(section: 'content')
+@section('content')
 <body>
     <div class="admin-container">
         <div class="admin-card">

@@ -24,6 +24,14 @@
             padding: 0;
             box-sizing: border-box;
         }
+.btn-watchlist.remove {
+    background-color: #dc3545; /* Bootstrap danger red */
+    color: white;
+}
+
+.btn-watchlist.remove:hover {
+    background-color: #c82333;
+}
 
         body {
             background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);

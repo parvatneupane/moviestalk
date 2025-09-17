@@ -1,6 +1,4 @@
-@extends('admin.adminlayout')
-
-    
+@extends('layouts.admin')
 
 <head>
     <meta charset="UTF-8">
@@ -9,7 +7,7 @@
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('admincss/users.css') }}">
 </head>
-@section(section: 'content')
+@section('content')
 
 <body>
     <div class="container">
@@ -28,7 +26,7 @@
 
                 <div class="user-menu">
                      <div class="user-profile">
-                        <div class="user-avatar"></div>
+                        <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
                         <div>
                              <div>{{ Auth::user()->name }}</div>
                         </div>

@@ -22,7 +22,7 @@ return new class extends Migration
         $table->text('cast')->nullable();              // main cast
         $table->string('poster')->nullable();          // poster image path
         $table->string('trailer_url')->nullable();     // YouTube/trailer link
-
+        
         $table->timestamps();
     });
 }

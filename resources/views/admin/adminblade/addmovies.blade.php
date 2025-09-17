@@ -1,41 +1,15 @@
-@extends('admin.adminlayout')
-
-@section('content')
-
+@extends('layouts.admin')
+    
 <head>
+ 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieTalk Admin - Users</title>
+    <title>MovieTalk Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('admincss/addmovies.css') }}">
 </head>
 
-<body>
-    <div class="container">
-        <!-- Main Content -->
-        <div class="main">
-            <!-- Header -->
-            <div class="header">
-                <div class="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </div>
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
-                </div>
-                <div class="user-menu">
-                    <div class="notification">
-                        <i class="fas fa-bell"></i>
-                        <div class="notification-badge">3</div>
-                    </div>
-                    <div class="user-profile">
-                        <div class="user-avatar">AM</div>
-                        <div>
-                            <div>Admin Manager</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+@section('content')
 
             <!-- Page Title -->
             <div class="dashboard-title">
@@ -146,7 +120,10 @@
                         <input type="url" name="trailer" id="trailer" class="form-input" placeholder="https://www.youtube.com/watch?v=..." required>
                     </div>
 
-                
+                 <div class="form-group">
+    <label><input type="checkbox" name="is_featured" {{ old('is_featured') ? 'checked' : '' }}> Featured</label>
+    <label style="margin-left: 20px;"><input type="checkbox" name="is_trending" {{ old('is_trending') ? 'checked' : '' }}> Trending</label>
+</div>
                    
                     <div class="form-actions">
                         <button type="reset" class="btn btn-secondary">Cancel</button>

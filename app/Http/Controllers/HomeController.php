@@ -7,14 +7,21 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+   
+  
     public function index()
-    {
-        $trendingMovies = Movie::orderBy('release_date', 'desc')
-            ->take(8)
-            ->get();
-        $featuredMovies = Movie::with('category')->orderBy('rating', 'desc')->take(6)->get();
-        $categories = Category::withCount('movies')->get();
-        
-        return view('home', compact('featuredMovies', 'categories','trendingMovies'));
-    }
+{
+    return view('home', [
+        'featuredMovies' => Movie::where('is_featured', true)->take(5)->get(),
+        'trendingMovies' => Movie::where('is_trending', true)->take(8)->get(),
+        'latestMovies'   => Movie::orderBy('release_year', 'desc')->take(8)->get(),
+        'topRatedMovies' => Movie::orderBy('rating', 'desc')->take(5)->get(), // <-- add this line
+        'categories'     => Category::withCount('movies')->get(),
+    ]);
+
+    
 }
+
+}
+
+    

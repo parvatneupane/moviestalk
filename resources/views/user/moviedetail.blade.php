@@ -1,17 +1,12 @@
-@extends('layouts.app')
 
-@section('title', $movie->title . ' - MovieTalks')
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/moviedetail.css') }}">
-@endpush
+
 
 @section('content')
-<!-- Movie Hero Section -->
 <section class="movie-hero">
     <div class="container">
         <div class="movie-hero-content">
-            <!-- Movie trailer -->
+       
             <div class="movie-trailer">
                 @if($movie->trailer_url)
                 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
@@ -24,7 +19,8 @@
                     </iframe>
                 </div>
                 @else
-                <img src="{{ asset('images/default-movie-poster.jpg') }}" alt="No trailer available">
+                
+                 <img src="{{ asset($movie->poster) }}" alt="{{ $movie->title }} poster">
                 @endif
             </div>
 
@@ -38,24 +34,28 @@
                 </div>
 
                 <div class="movie-actions">
-                    @auth
-                        @if($inWatchlist)
-                        <button class="btn btn-watchlist added">
-                            <i class="fas fa-check"></i> In Watchlist
-                        </button>
-                        @else
-                        <form action="{{ route('movie.toggle-watchlist', $movie->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-watchlist">
-                                <i class="fas fa-plus"></i> Add to Watchlist
-                            </button>
-                        </form>
-                        @endif
-                    @else
-                        <a href="{{ route('user.login.form') }}" class="btn btn-watchlist">
-                            <i class="fas fa-plus"></i> Add to Watchlist
-                        </a>
-                    @endauth
+                   @auth
+    @if($inWatchlist)
+        <form action="{{ route('movie.remove-watchlist', $movie->id) }}" method="POST" style="display:inline-block;">
+            @csrf
+            <button type="submit" class="btn btn-watchlist remove">
+                <i class="fas fa-times"></i> Remove from Watchlist
+            </button>
+        </form>
+    @else
+        <form action="{{ route('movie.toggle-watchlist', $movie->id) }}" method="POST" style="display:inline-block;">
+            @csrf
+            <button type="submit" class="btn btn-watchlist">
+                <i class="fas fa-plus"></i> Add to Watchlist
+            </button>
+        </form>
+    @endif
+@else
+    <a href="{{ route('user.login.form') }}" class="btn btn-watchlist">
+        <i class="fas fa-plus"></i> Add to Watchlist
+    </a>
+@endauth
+
                 </div>
 
                 <p class="movie-description">{{ $movie->description }}</p>

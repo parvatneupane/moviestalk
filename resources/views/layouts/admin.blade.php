@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieTalk Admin</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    {{-- <link rel="stylesheet" href="{{ asset('admincss/adminlayout.css') }}"> --}}
+
+    {{-- Include extra styles from child views --}}
+    @stack('styles')
 
     <style>
         body {
@@ -20,7 +23,6 @@
             width: 100%;
         }
 
-        /* Sidebar */
         .sidebar {
             width: 250px;
             background: #2c3e50;
@@ -83,7 +85,6 @@
             background: #34495e;
         }
 
-        /* Collapsed Sidebar */
         .sidebar.active {
             width: 60px;
         }
@@ -94,7 +95,6 @@
             display: none;
         }
 
-        /* Main Content */
         main {
             margin-left: 250px;
             padding: 20px;
@@ -105,71 +105,96 @@
         .sidebar.active ~ main {
             margin-left: 60px;
         }
+
+        /* User info in sidebar */
+        .user-info-sidebar {
+            padding: 15px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 10px;
+        }
+        
+        .user-avatar-sidebar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .user-name-sidebar {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .user-role-sidebar {
+            font-size: 12px;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="user-profile">
-                        <div class="user-avatar"></div>
-                        <div>
-                             <div>{{ Auth::user()->name }}</div>
-                        </div>
-                    </div>
         <div class="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fas fa-film"></i> <span>MovieTalk</span></h2>
                 <button class="menu-toggle"><i class="fas fa-bars"></i></button>
             </div>
+            
+          
             <div class="sidebar-menu">
                 <div class="menu-label">Main Navigation</div>
-                <a href="{{url(path: '/admin/dashboard')}}" class="menu-item active">
+                <a href="{{ url('/admin/dashboard') }}" class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-                
+
                 <div class="menu-label">Content Management</div>
-                <a href="{{url(path: '/admin/users')}}" class="menu-item active">
+                <a href="{{ url('/admin/users') }}" class="menu-item {{ request()->is('admin/users') ? 'active' : '' }}">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
 
-
-                <a href="{{url(path: '/admin/movies')}}" class="menu-item active">
+                <a href="{{ url('/admin/movies') }}" class="menu-item {{ request()->is('admin/movies') ? 'active' : '' }}">
                     <i class="fas fa-film"></i>
                     <span>Movies</span>
                 </a>
 
-                <a href="{{url(path: '/admin/addmovies')}}" class="menu-item active">
+                <a href="{{ url('/admin/addmovies') }}" class="menu-item {{ request()->is('admin/addmovies') ? 'active' : '' }}">
                     <i class="fas fa-plus"></i>
                     <span>Add Movies</span>
                 </a>
 
-
-                <a href="{{url(path: '/admin/genres')}}" class="menu-item active">
+                <a href="{{ url('/admin/genres') }}" class="menu-item {{ request()->is('admin/genres') ? 'active' : '' }}">
                     <i class="fas fa-film"></i>
                     <span>Genres</span>
                 </a>
-                
-                
+
                 <div class="menu-label">System</div>
-              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-    @csrf
-</form>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
 
-<a href="#" class="menu-item"
-   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-    <i class="fas fa-cog"></i>
-    <span>Logout</span>
-</a>
-
+                <a href="#" class="menu-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
             </div>
         </div>
 
         <!-- Main Content -->
         <main>
+            {{-- Content from child views will go here --}}
             @yield('content')
         </main>
     </div>
+
+    {{-- Include extra scripts from child views --}}
+    @stack('scripts')
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {

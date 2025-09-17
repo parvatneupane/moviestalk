@@ -1,4 +1,4 @@
-@extends('admin.adminlayout')
+@extends('layouts.admin')
 
 <head>
     <meta charset="UTF-8">
@@ -13,6 +13,24 @@
 
 <div class="container">
     <div class="main">
+        <!-- Header -->
+        <div class="header">
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="user-menu">
+                <div class="user-profile">
+                    <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
+                    <div>
+                        <div>{{ Auth::user()->name }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Page Title -->
         <div class="dashboard-title">

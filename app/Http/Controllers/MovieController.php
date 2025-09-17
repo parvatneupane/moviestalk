@@ -224,13 +224,23 @@ public function insertmovies(Request $request)
 
     // 3. Poster file upload
     if ($request->hasFile('poster')) {
-        $posterPath = $request->file('poster')->store('posters', 'public'); 
-        // stored in storage/app/public/posters
-        $movie->poster = 'storage/' . $posterPath;  // so it can be accessed via asset()
+
+    // Delete old poster if it exists and isn't default/fallback image
+    if ($movie->poster && Storage::disk('public')->exists($movie->poster)) {
+        Storage::disk('public')->delete($movie->poster);
     }
+
+    // Store new poster
+    $posterPath = $request->file('poster')->store('posters', 'public');
+
+    // Save new path
+    $movie->poster = $posterPath;  // Just "posters/filename.jpg"
+}
 
     $movie->trailer_url  = $request->trailer;
     $movie->release_year = $request->release_year;
+$movie->is_featured = $request->has('is_featured');
+$movie->is_trending = $request->has('is_trending');
 
     $movie->save();
 
@@ -298,13 +308,24 @@ public function update(Request $request, $id)
 
     // 3. Poster file upload
     if ($request->hasFile('poster')) {
-        $posterPath = $request->file('poster')->store('posters', 'public'); 
-        // stored in storage/app/public/posters
-        $movie->poster = 'storage/' . $posterPath;  // so it can be accessed via asset()
+
+    // Delete old poster if it exists and isn't default/fallback image
+    if ($movie->poster && Storage::disk('public')->exists($movie->poster)) {
+        Storage::disk('public')->delete($movie->poster);
     }
+
+    // Store new poster
+    $posterPath = $request->file('poster')->store('posters', 'public');
+
+    // Save new path
+    $movie->poster = $posterPath;  // Just "posters/filename.jpg"
+}
+
 
     $movie->trailer_url  = $request->trailer;
     $movie->release_year = $request->release_year;
+$movie->is_featured = $request->has('is_featured');
+$movie->is_trending = $request->has('is_trending');
 
     $movie->save();
 
@@ -393,5 +414,9 @@ public function show($movieId)
       
     return back()->with('success', 'Rating submitted successfully.');
 }
+
+
+  
+
 
 }

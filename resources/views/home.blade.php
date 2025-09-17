@@ -21,7 +21,8 @@
     @else
         
         <div class="no-trailer">
-            <img src="{{asset('images/Inception.jpeg')}}" alt="No trailer available">
+<img src="{{ asset('storage/' . $movie->poster) }}" alt="{{ $movie->title }} poster">
+
             <p>No trailer available</p>
         </div>
     @endif
@@ -95,7 +96,9 @@
                 @foreach($featuredMovies as $movie)
                     <article class="movie-card">
                         <div class="card-image">
-                            <img src="{{ asset('storage/' . $movie->poster) }}" alt="{{ $movie->title }} poster">
+<img src="{{ $movie->poster_url }}" alt="{{ $movie->title }}">
+
+
                             <span class="card-badge">Featured</span>
                         </div>
                         <div class="card-content">
@@ -121,6 +124,41 @@
             </div>
         </div>
     </section>
+<!-- Trending Now -->
+<section class="movie-row trending">
+    <div class="container">
+        <h2 class="section-title">Trending Now</h2>
+        <div class="movies-grid">
+            @foreach($trendingMovies as $movie)
+                @include('partials.movie-card', ['movie' => $movie, 'badge' => 'Trending'])
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<!-- Latest Releases -->
+<section class="movie-row latest">
+    <div class="container">
+        <h2 class="section-title">Latest Releases</h2>
+        <div class="movies-grid">
+            @foreach($latestMovies as $movie)
+                @include('partials.movie-card', ['movie' => $movie, 'badge' => 'New'])
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<!-- Top Rated -->
+<section class="movie-row top-rated">
+    <div class="container">
+        <h2 class="section-title">Top Rated</h2>
+        <div class="movies-grid">
+            @foreach($topRatedMovies as $movie)
+                @include('partials.movie-card', ['movie' => $movie, 'badge' => 'Top Rated'])
+            @endforeach
+        </div>
+    </div>
+</section>
 
     <!-- Categories Section -->
     <section class="categories">

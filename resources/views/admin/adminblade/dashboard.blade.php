@@ -1,17 +1,19 @@
-@extends('admin.adminlayout')
+@extends('layouts.admin')
 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieTalk Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('admincss/dashboard.css') }}">
 </head>
-<body>
+
 @section('content')
 
-    <div class="container">
-    
 
+<body>
+    <body>
+    <div class="container">
         <!-- Main Content -->
         <div class="main">
             <!-- Header -->
@@ -19,19 +21,17 @@
                 <div class="menu-toggle">
                     <i class="fas fa-bars"></i>
                 </div>
+
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
+                    <input type="text" placeholder="Search users...">
                 </div>
+
                 <div class="user-menu">
-                    <div class="notification">
-                        <i class="fas fa-bell"></i>
-                        <div class="notification-badge">3</div>
-                    </div>
-                    <div class="user-profile">
-                        <div class="user-avatar">AM</div>
+                     <div class="user-profile">
+                        <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
                         <div>
-                            <div>Admin Manager</div>
+                             <div>{{ Auth::user()->name }}</div>
                         </div>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
             <!-- Dashboard Title -->
             <div class="dashboard-title">
                 <h1>Dashboard Overview</h1>
-                <p>Welcome back! Here's what's happening with MovieTalk today.</p>
+                <p>Welcome back,  Here's what's happening with MovieTalk today.</p>
             </div>
 
             <!-- Stats Cards -->
@@ -53,7 +53,7 @@
                         <div class="stat-value">{{ $users }}</div>
                         <div class="stat-label">Total Users</div>
                         <div class="stat-change up">
-                            <i class="fas fa-arrow-up"></i> 12.5% from last week
+                            <i class="fas fa-arrow-up"></i> 
                         </div>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                         <div class="stat-value">{{ $movies }}</div>
                         <div class="stat-label">Movies</div>
                         <div class="stat-change up">
-                            <i class="fas fa-arrow-up"></i> 3.2% from last week
+                            <i class="fas fa-arrow-up"></i> 
                         </div>
                     </div>
                 </div>

@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Facades\Storage;
 class Movie extends Model
 {
     use HasFactory;
@@ -23,7 +22,8 @@ protected $table = 'movies';
 'trailer_url',
 'category_id',
 'release_year',
-
+'is_featured',
+'is_trending'
     ];
   public function category()
     {
@@ -60,5 +60,17 @@ public function getPosterUrlAttribute()
    
     return asset('images/default-movie-poster.jpg');
 }
+
+
+
+protected static function booted()
+{
+    static::deleting(function ($movie) {
+        if ($movie->poster && Storage::disk('public')->exists($movie->poster)) {
+            Storage::disk('public')->delete($movie->poster);
+        }
+    });
+}
+
 
 }
