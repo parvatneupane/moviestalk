@@ -88,7 +88,7 @@
                      @foreach($movies as $data)
                     <tr>
                         <td>
-                   <img src="{{ asset(  $data->poster) }}" alt="{{ $data->title }}" class="movie-poster">
+        <img src="{{ asset('storage/' . $data->poster) }}" alt="{{ $data->title }} poster">
 
                             </td>
                         <td>

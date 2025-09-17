@@ -1,6 +1,8 @@
+@extends('layouts.app')
 
+ @section('MovieTalks')
 
-
+<link rel="stylesheet" href="{{ asset('css/moviedetail.css') }}">
 
 @section('content')
 <section class="movie-hero">

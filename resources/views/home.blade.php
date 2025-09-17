@@ -6,64 +6,55 @@
 
 @section('content')
     <!-- Video Slider Section -->
-    <section class="video-slider-container">
+    <section class="video-slider-container" aria-label="Featured movie trailers">
         @foreach($featuredMovies as $movie)
-          
-             <div class="video-slide {{ $loop->first ? 'active' : '' }}">
-    @if($movie->trailer_url)
-        <iframe 
-             src="https://www.youtube.com/embed/{{ \Illuminate\Support\Str::after($movie->trailer_url, 'v=') }}?autoplay=1&mute=1" 
-            frameborder="0" 
-            allow="autoplay; encrypted-media" 
-            allowfullscreen
-            aria-label="Trailer for {{ $movie->title }}"
-        ></iframe>
-    @else
-        
-        <div class="no-trailer">
-<img src="{{ asset('storage/' . $movie->poster) }}" alt="{{ $movie->title }} poster">
+            <div class="video-slide {{ $loop->first ? 'active' : '' }}">
+                @if($movie->trailer_url)
+                    <iframe 
+                        src="https://www.youtube.com/embed/{{ \Illuminate\Support\Str::after($movie->trailer_url, 'v=') }}?autoplay=1&mute=1" 
+                        frameborder="0" 
+                        allow="autoplay; encrypted-media" 
+                        allowfullscreen
+                        aria-label="Trailer for {{ $movie->title }}"
+                    ></iframe>
+                @else
+                    <div class="no-trailer">
+                        <img src="{{ asset('storage/' . $movie->poster) }}" alt="{{ $movie->title }} poster">
+                        <p>No trailer available</p>
+                    </div>
+                @endif
 
-            <p>No trailer available</p>
-        </div>
-    @endif
+                <div class="slide-content">
+                    <div class="container">
+                        <h2>{{ $movie->title }}</h2>
+                        <p>{{ Str::limit($movie->description, 150) }}</p>
+                        <div class="slide-meta">
+                            <span><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
+                            <span><i class="fas fa-clock" aria-hidden="true"></i> {{ $movie->duration }}</span>
+                            <span><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ $movie->release_year }}</span>
+                        </div>
+                        <div class="slide-buttons">
+                            <a href="{{ route('movie.detail', $movie->id) }}" class="btn btn-primary watch-btn" data-id="{{ $movie->id }}">
+                                <i class="fas fa-play"></i> Watch Now
+                            </a>
 
-    <div class="slide-content">
-        <div class="container">
-            <h2>{{ $movie->title }}</h2>
-            <p>{{ Str::limit($movie->description, 150) }}</p>
-            <div class="slide-meta">
-                <span><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
-                <span><i class="fas fa-clock" aria-hidden="true"></i> {{ $movie->duration }}</span>
-                <span><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ $movie->release_year }}</span>
+                            @auth
+                                <form action="{{ route('mylist.add') }}" method="POST" class="add-watchlist-form inline-block">
+                                    @csrf
+                                    <input type="hidden" name="movie_id" value="{{ $movie->id }}">
+                                    <button type="submit" class="btn btn-secondary add-watchlist">
+                                        <i class="fas fa-plus"></i> Add to Watchlist
+                                    </button>
+                                </form>
+                            @else
+                                <a href="{{ route('user.login.form') }}" class="btn btn-secondary add-watchlist">
+                                    <i class="fas fa-plus"></i> Add to Watchlist
+                                </a>
+                            @endauth
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="slide-buttons">
-    <!-- Watch Now -->
-    <a href="{{ route('movie.detail', $movie->id) }}" class="btn btn-primary watch-btn" data-id="{{ $movie->id }}">
-        <i class="fas fa-play"></i> Watch Now
-    </a>
-
-    @auth
-        <form action="{{ route('mylist.add') }}" method="POST" class="add-watchlist-form inline-block">
-            @csrf
-            <input type="hidden" name="movie_id" value="{{ $movie->id }}">
-            <button type="submit" class="btn btn-secondary add-watchlist">
-                <i class="fas fa-plus"></i> Add to Watchlist
-            </button>
-        </form>
-    @else
-        <a href="{{ route('user.login.form') }}" class="btn btn-secondary add-watchlist">
-            <i class="fas fa-plus"></i> Add to Watchlist
-        </a>
-    @endauth
-</div>
-
-
-    
-             
-        </div>
-    </div>
-</div> 
-
         @endforeach
 
         <div class="slider-controls">
@@ -86,7 +77,7 @@
     <section class="featured-movies">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title"> Movies</h2>
+                <h2 class="section-title">Movies</h2>
                 <a href="{{ route('movies') }}" class="view-all">
                     View All <i class="fas fa-arrow-right"></i>
                 </a>
@@ -96,15 +87,13 @@
                 @foreach($featuredMovies as $movie)
                     <article class="movie-card">
                         <div class="card-image">
-<img src="{{ $movie->poster_url }}" alt="{{ $movie->title }}">
-
-
+                            <img src="{{ $movie->poster_url }}" alt="{{ $movie->title }}">
                             <span class="card-badge">Featured</span>
                         </div>
                         <div class="card-content">
                             <h3 class="card-title">{{ $movie->title }}</h3>
                             <div class="card-meta">
-                                <span>{{ $movie->release_year }} </span>
+                                <span>{{ $movie->release_year }}</span>
                                 <span class="card-rating">
                                     <i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}
                                 </span>
@@ -124,41 +113,93 @@
             </div>
         </div>
     </section>
-<!-- Trending Now -->
-<section class="movie-row trending">
-    <div class="container">
-        <h2 class="section-title">Trending Now</h2>
-        <div class="movies-grid">
-            @foreach($trendingMovies as $movie)
-                @include('partials.movie-card', ['movie' => $movie, 'badge' => 'Trending'])
-            @endforeach
-        </div>
-    </div>
-</section>
 
-<!-- Latest Releases -->
-<section class="movie-row latest">
-    <div class="container">
-        <h2 class="section-title">Latest Releases</h2>
-        <div class="movies-grid">
-            @foreach($latestMovies as $movie)
-                @include('partials.movie-card', ['movie' => $movie, 'badge' => 'New'])
-            @endforeach
+    <!-- Trending Now -->
+    <section class="movie-row trending">
+        <div class="container">
+            <h2 class="section-title">Trending Now</h2>
+            <div class="movies-grid">
+                @foreach($trendingMovies as $movie)
+                    <article class="movie-card">
+                        <div class="card-image">
+                            <img src="{{ $movie->poster_url }}" alt="{{ $movie->title }}">
+                            <span class="card-badge">Trending</span>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">{{ $movie->title }}</h3>
+                            <div class="card-meta">
+                                <span>{{ $movie->release_year }}</span>
+                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
+                            </div>
+                            <p class="card-description">{{ Str::limit($movie->description, 100) }}</p>
+                            <div class="card-actions">
+                                <a href="{{ route('movie.detail', $movie->id) }}"><i class="fas fa-play"></i> Watch</a>
+                                <a href="{{ route('movie.detail', $movie->id) }}"><i class="fas fa-info-circle"></i> Details</a>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Top Rated -->
-<section class="movie-row top-rated">
-    <div class="container">
-        <h2 class="section-title">Top Rated</h2>
-        <div class="movies-grid">
-            @foreach($topRatedMovies as $movie)
-                @include('partials.movie-card', ['movie' => $movie, 'badge' => 'Top Rated'])
-            @endforeach
+    <!-- Latest Releases -->
+    <section class="movie-row latest">
+        <div class="container">
+            <h2 class="section-title">Latest Releases</h2>
+            <div class="movies-grid">
+                @foreach($latestMovies as $movie)
+                    <article class="movie-card">
+                        <div class="card-image">
+                            <img src="{{ $movie->poster_url }}" alt="{{ $movie->title }}">
+                            <span class="card-badge">Latest</span>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">{{ $movie->title }}</h3>
+                            <div class="card-meta">
+                                <span>{{ $movie->release_year }}</span>
+                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
+                            </div>
+                            <p class="card-description">{{ Str::limit($movie->description, 100) }}</p>
+                            <div class="card-actions">
+                                <a href="{{ route('movie.detail', $movie->id) }}"><i class="fas fa-play"></i> Watch</a>
+                                <a href="{{ route('movie.detail', $movie->id) }}"><i class="fas fa-info-circle"></i> Details</a>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+
+    <!-- Top Rated -->
+    <section class="movie-row top-rated">
+        <div class="container">
+            <h2 class="section-title">Top Rated</h2>
+            <div class="movies-grid">
+                @foreach($topRatedMovies as $movie)
+                    <article class="movie-card">
+                        <div class="card-image">
+                            <img src="{{ $movie->poster_url }}" alt="{{ $movie->title }}">
+                            <span class="card-badge">Top Rated</span>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">{{ $movie->title }}</h3>
+                            <div class="card-meta">
+                                <span>{{ $movie->release_year }}</span>
+                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
+                            </div>
+                            <p class="card-description">{{ Str::limit($movie->description, 100) }}</p>
+                            <div class="card-actions">
+                                <a href="{{ route('movie.detail', $movie->id) }}"><i class="fas fa-play"></i> Watch</a>
+                                <a href="{{ route('movie.detail', $movie->id) }}"><i class="fas fa-info-circle"></i> Details</a>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
 
     <!-- Categories Section -->
     <section class="categories">
@@ -169,7 +210,7 @@
 
             <div class="categories-grid">
                 @foreach($categories as $category)
-                    <a href="{{ route('movies', ['category' => $category->slug]) }}" class="category-card" role="button">
+                    <a href="{{ route('movies', ['category' => $category->name]) }}" class="category-card" role="button">
                         <i class="fas fa-film" aria-hidden="true"></i>
                         <h3>{{ $category->name }}</h3>
                         <span class="count">{{ $category->movies_count }} movies</span>

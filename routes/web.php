@@ -20,7 +20,7 @@ Route::post('/contact/submit', [ContactController::class, 'submit'])->name('cont
 Route::get('/login', [UserController::class, 'loginForm'])->name('login');
 Route::get('user/movies', [MovieController::class, 'index'])->name('movies');
 Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.search');
-
+Route::get('user/movie/{movieId}', [MovieController::class, 'show'])->name('movie.detail');
 Route::prefix('user')->group(function () {
   
     Route::get('/login', [UserController::class, 'loginForm'])->name('user.login.form');
@@ -39,7 +39,7 @@ Route::prefix('user')->group(function () {
 });
 
 
-Route::get('user/movie/{movieId}', [MovieController::class, 'show'])->name('movie.detail');
+
 // Protected Routes (Require Authentication)
 Route::middleware(['auth'])->group(function () {
     // Dashboard
