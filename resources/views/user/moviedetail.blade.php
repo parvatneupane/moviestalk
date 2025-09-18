@@ -396,17 +396,22 @@ function submitReview(review, update){
     <!-- Similar Movies -->
     <section class="similar-movies">
         <h2 class="section-title">You Might Also Like</h2>
-        <div class="movies-grid">
-            @foreach($similarMovies as $similar)
-            <div class="movie-card">
-                <a href="{{ route('movie.detail', $similar->id) }}">
-                    <img src="{{ asset('storage/' . $similar->poster) }}" alt="{{ $similar->title }}">
+       <div class="movies-grid">
+    @foreach($similarMovies as $similar)
+        <div class="movie-card">
+            <a href="{{ route('movie.detail', $similar->id) }}">
+                <div class="movie-poster">
+                    <img src="{{ asset('storage/' . $similar->poster) }}" alt="{{ $similar->title }}" >
+                </div>
+                <div class="movie-info">
                     <h3>{{ $similar->title }}</h3>
-                    <span>{{ $similar->release_date }}</span>
-                </a>
-            </div>
-            @endforeach
+                    <span>{{ \Carbon\Carbon::parse($similar->release_date)->format('Y-m-d') }}</span>
+                </div>
+            </a>
         </div>
+    @endforeach
+</div>
+
     </section>
 </main>
 @endsection

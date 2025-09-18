@@ -258,17 +258,17 @@ public function update(Request $request, $id)
         'content_rating' => 'nullable|string|max:50',
         'writer'         => 'nullable|string|max:255',
         'production'     => 'nullable|string|max:255',
-        'genres'         => 'required|array',          // expecting array from form
         'cast'           => 'nullable|string',
-        'poster'         => 'required|image|mimes:jpg,jpeg,png|max:2048', // poster must be image
+        'poster'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // optional
         'trailer'        => 'nullable|url',
         'release_year'   => 'nullable|integer',
-        'category_id'    => 'required|array',
+        'category'       => 'required|integer',
     ]);
-    // Find movie
+
+    // 2. Find existing movie
     $movie = Movie::findOrFail($id);
 
-   // 2. Assign fields
+    // 3. Assign fields
     $movie->title          = $request->title;
     $movie->description    = $request->description;
     $movie->release_date   = $request->release_date;
@@ -277,38 +277,32 @@ public function update(Request $request, $id)
     $movie->content_rating = $request->content_rating;
     $movie->writer         = $request->writer;
     $movie->production     = $request->production;
+    $movie->category_id    = $request->category;
+    $movie->cast           = $request->cast;
+    $movie->trailer_url    = $request->trailer;   // ✅ matches table column
+    $movie->release_year   = $request->release_year;
+    $movie->is_featured    = $request->has('is_featured');
+    $movie->is_trending    = $request->has('is_trending');
 
-    // store genres as comma separated
-    $movie->genres = implode(',', $request->genres); 
-    $movie->category_id = implode(',', $request->genres); // if you are mapping to categories
-
-    $movie->cast = $request->cast;
-
-    // 3. Poster file upload
+    // 4. Poster upload (optional)
     if ($request->hasFile('poster')) {
+        // Delete old poster if exists
+        if ($movie->poster && Storage::disk('public')->exists($movie->poster)) {
+            Storage::disk('public')->delete($movie->poster);
+        }
 
-    // Delete old poster if it exists and isn't default/fallback image
-    if ($movie->poster && Storage::disk('public')->exists($movie->poster)) {
-        Storage::disk('public')->delete($movie->poster);
+        // Store new poster
+        $posterPath = $request->file('poster')->store('posters', 'public');
+        $movie->poster = $posterPath;
     }
 
-    // Store new poster
-    $posterPath = $request->file('poster')->store('posters', 'public');
-
-    // Save new path
-    $movie->poster = $posterPath;  // Just "posters/filename.jpg"
-}
-
-
-    $movie->trailer_url  = $request->trailer;
-    $movie->release_year = $request->release_year;
-$movie->is_featured = $request->has('is_featured');
-$movie->is_trending = $request->has('is_trending');
-
+    // 5. Save changes
     $movie->save();
 
     return redirect('/admin/movies')->with('success', 'Movie updated successfully!');
 }
+
+
 // delete movies
 public function destroy($id)
 {
@@ -383,6 +377,11 @@ public function rating($id, Request $request)
 
     // Get updated average rating
     $averageRating = Rating::where('movie_id', $id)->avg('rating');
+
+    // ✅ Update movies table with the average
+    \DB::table('movies')
+        ->where('id', $id)
+        ->update(['rating' => round($averageRating, 1)]);
 
     return response()->json([
         'success' => true,

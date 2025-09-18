@@ -29,7 +29,7 @@
                         <h2>{{ $movie->title }}</h2>
                         <p>{{ Str::limit($movie->description, 150) }}</p>
                         <div class="slide-meta">
-                            <span><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
+                            <span><i class="fas fa-star" aria-hidden="true"></i>  {{ $movie->rating ?? '0.00' }}</span>
                             <span><i class="fas fa-clock" aria-hidden="true"></i> {{ $movie->duration }}</span>
                             <span><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ $movie->release_year }}</span>
                         </div>
@@ -95,7 +95,7 @@
                             <div class="card-meta">
                                 <span>{{ $movie->release_year }}</span>
                                 <span class="card-rating">
-                                    <i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}
+                                    <i class="fas fa-star" aria-hidden="true"></i>  {{ $movie->rating ?? '0.00' }}
                                 </span>
                             </div>
                             <p class="card-description">{{ Str::limit($movie->description, 100) }}</p>
@@ -129,7 +129,7 @@
                             <h3 class="card-title">{{ $movie->title }}</h3>
                             <div class="card-meta">
                                 <span>{{ $movie->release_year }}</span>
-                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
+                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i>  {{ $movie->rating ?? '0.00' }}</span>
                             </div>
                             <p class="card-description">{{ Str::limit($movie->description, 100) }}</p>
                             <div class="card-actions">
@@ -158,7 +158,7 @@
                             <h3 class="card-title">{{ $movie->title }}</h3>
                             <div class="card-meta">
                                 <span>{{ $movie->release_year }}</span>
-                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
+                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i>  {{ $movie->rating ?? '0.00' }}</span>
                             </div>
                             <p class="card-description">{{ Str::limit($movie->description, 100) }}</p>
                             <div class="card-actions">
@@ -187,7 +187,7 @@
                             <h3 class="card-title">{{ $movie->title }}</h3>
                             <div class="card-meta">
                                 <span>{{ $movie->release_year }}</span>
-                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i> {{ $movie->rating }}</span>
+                                <span class="card-rating"><i class="fas fa-star" aria-hidden="true"></i>  {{ $movie->rating ?? '0.00' }}</span>
                             </div>
                             <p class="card-description">{{ Str::limit($movie->description, 100) }}</p>
                             <div class="card-actions">

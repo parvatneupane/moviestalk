@@ -17,6 +17,7 @@ class HomeController extends Controller
         'latestMovies'   => Movie::orderBy('release_year', 'desc')->take(8)->get(),
         'topRatedMovies' => Movie::orderBy('rating', 'desc')->take(5)->get(), 
         'categories'     => Category::withCount('movies')->get(),
+        
     ]);
 
     

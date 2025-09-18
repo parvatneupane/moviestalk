@@ -1,4 +1,5 @@
-@extends('admin.layouts')
+
+@extends('layouts.admin')
     
 <head>
     <meta charset="UTF-8">
