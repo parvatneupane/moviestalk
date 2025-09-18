@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -33,7 +34,7 @@ public function login(Request $request)
         $user = Auth::user();
 
         if ($user->role == 'admin') {
-            // Fetch data for admin dashboard
+          
             $usersCount = User::count();
             $moviesCount = Movie::count();
 
@@ -54,14 +55,13 @@ public function login(Request $request)
 
 
 
-    // Show Register Form
+  
     public function registerForm()
     {
         
         return view('user.register');
     }
 
-    // Handle Registration Request
     public function register(Request $request)
     {
         $request->validate([
@@ -85,20 +85,20 @@ public function login(Request $request)
         }
     }
 
-    // Show Dashboard
+   
     public function dashboard()
     {
         $user = Auth::user();
         return view('user.home', compact('user'));
     }
 
-    // Show Forgot Password Form
+  
     public function showForgotPasswordForm()
     {
         return view('user.forgot-password');
     }
 
-    // Handle Forgot Password Request
+  
     public function sendResetLinkEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -112,13 +112,13 @@ public function login(Request $request)
         }
     }
 
-    // Show Reset Password Form
+   
     public function showResetPasswordForm($token)
     {
         return view('user.reset-password', ['token' => $token]);
     }
 
-    // Handle Reset Password Request
+   
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -140,14 +140,14 @@ public function login(Request $request)
         }
     }
 
-    // Logout the User
+  
     public function logout()
     {
         Auth::logout();
         return redirect()->route('home')->with('success', 'Logged out successfully!');
     }
 
-    // Admin User Management
+  
     public function index()
     {
         if (Auth::user()->role != 'admin') {
@@ -158,19 +158,38 @@ public function login(Request $request)
         return view('admin.adminblade.users', compact('users'));
     }
 
-    // Update Profile Information
-    public function updateProfile(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . Auth::id(),
-        ]);
+   public function updateProfile(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . Auth::id(),
+        'avatar' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+    ]);
 
-        $user = Auth::user();
-        $user->update($request->only('name', 'email'));
+    $user = Auth::user();
 
-        return back()->with('success', 'Profile updated successfully!');
+    $user->name = $request->name;
+    $user->email = $request->email;
+
+    if ($request->hasFile('avatar')) {
+
+
+    if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+        Storage::disk('public')->delete($user->avatar);
     }
+
+   
+    $avatarPath = $request->file('avatar')->store('avatars', 'public');
+
+   
+    $user->avatar = $avatarPath;  
+}
+
+    $user->save();
+
+    return back()->with('success', 'Profile updated successfully!');
+}
+
 
     // Update Password
     public function updatePassword(Request $request)

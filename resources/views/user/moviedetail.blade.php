@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <!-- Movie Details -->
+       
         <div class="movieinfo">
             <div class="movie-details-grid">
                 <div class="detail-item"><span class="detail-label">Director:</span> <span class="detail-value">{{ $movie->director ?? 'N/A' }}</span></div>
@@ -261,8 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </section>
 
 <main class="container">
-<!-- Reviews Section -->
-<!-- Reviews Section -->
+
 <section class="reviews-section">
     <h2 class="section-title">User Reviews</h2>
 
@@ -364,22 +363,33 @@ function submitReview(review, update){
     <p>Please <a href="{{ route('user.login.form') }}">login</a> to write a review.</p>
     @endauth
 
-    <!-- Display Reviews -->
-    <div class="reviews-list mt-4">
-        @forelse($reviews as $review)
-            <div class="review-card border p-3 mb-3 rounded">
-                <div class="review-header mb-2">
+ 
+   <div class="reviews-list mt-4">
+    @forelse($reviews as $review)
+        <div class="review-card border p-3 mb-3 rounded d-flex gap-3 align-items-start">
+        
+            <img 
+  src="{{ $review->user->avatar ? asset('storage/' . $review->user->avatar) : asset('images/default-avatar.png') }}" 
+  alt="{{ $review->user->name }}'s Avatar" 
+  class="rounded-circle"
+  style="width: 50px; height: 50px; object-fit: cover;">
+
+         
+            <div class="flex-grow-1">
+                <div class="review-header mb-1 d-flex justify-content-between align-items-center">
                     <strong>{{ $review->user->name }}</strong>
-                    <span class="text-muted">{{ $review->created_at->format('F j, Y') }}</span>
+                    <span class="text-muted" style="font-size: 0.85rem;">{{ $review->created_at->format('F j, Y') }}</span>
                 </div>
                 <div class="review-content">
-                    <p>{{ $review->review }}</p>
+                    <p class="mb-0">{{ $review->review }}</p>
                 </div>
             </div>
-        @empty
-            <p>No reviews yet.</p>
-        @endforelse
-    </div>
+        </div>
+    @empty
+        <p>No reviews yet.</p>
+    @endforelse
+</div>
+
 </section>
 
 

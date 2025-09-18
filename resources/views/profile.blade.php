@@ -4,15 +4,18 @@
 <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 
 @section('content')
-<!-- Main Profile Content -->
+
 <div class="container profile-container">
-    <!-- User Information Card -->
+
     <div class="profile-card">
         <div class="profile-header">
-            <img id="avatarPreview" 
-                 src="{{ auth()->user()->avatar ? asset('storage/avatars/' . auth()->user()->avatar) : 'https://www.gravatar.com/avatar/' . md5(auth()->user()->email) }}" 
-                 alt="User Avatar" 
-                 class="avatar">
+          <img id="avatarPreview" 
+     src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('images/default-avatar.png') }}" 
+     alt="User Avatar"
+      class="rounded-circle"
+                style="width: 50px; height: 50px; object-fit: cover;">
+
+
             <div class="user-info">
                 <h1>{{ auth()->user()->name }}</h1>
                 <span class="badge">Movietalk Member</span>

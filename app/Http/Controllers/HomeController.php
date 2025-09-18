@@ -15,7 +15,7 @@ class HomeController extends Controller
         'featuredMovies' => Movie::where('is_featured', true)->take(5)->get(),
         'trendingMovies' => Movie::where('is_trending', true)->take(8)->get(),
         'latestMovies'   => Movie::orderBy('release_year', 'desc')->take(8)->get(),
-        'topRatedMovies' => Movie::orderBy('rating', 'desc')->take(5)->get(), // <-- add this line
+        'topRatedMovies' => Movie::orderBy('rating', 'desc')->take(5)->get(), 
         'categories'     => Category::withCount('movies')->get(),
     ]);
 
