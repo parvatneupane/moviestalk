@@ -10,6 +10,7 @@ use App\Http\Controllers\MyListController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\WatchlistController;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -87,11 +88,11 @@ Route::post('/movies/{movieId}/review/update', [MovieController::class, 'updateR
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/mylist', [MyListController::class, 'index'])->name('mylist');
-    Route::post('/mylist/add', [MyListController::class, 'store'])->name('mylist.add');
-    Route::delete('/mylist/remove/{id}', [MyListController::class, 'destroy'])->name('mylist.remove');
-    
-    Route::post('/mylist/toggle-watched/{id}', [MyListController::class, 'toggleWatched'])->name('mylist.toggle-watched');
-    Route::post('/mylist/update-progress/{id}', [MyListController::class, 'updateProgress'])->name('mylist.update-progress');
+        Route::post('/watchlist/toggle/{movieId}', [WatchlistController::class, 'toggle'])->name('watchlist.toggle');
+    Route::post('/watchlist/mark/{id}', [WatchlistController::class, 'markWatched'])->name('watchlist.mark');
+    Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
+    Route::post('/mylist/add/{movie}', [WatchlistController::class, 'add'])->name('mylist.add');
+
 });
 
 

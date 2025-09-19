@@ -1,23 +1,17 @@
 <?php
 
+
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Watchlist extends Model
 {
     use HasFactory;
-
-    // Specify the table name if it's different from 'watchlists'
-    protected $table = 'watchlist'; // or 'watchlists' depending on your actual table name
-
-    protected $fillable = [
-        'user_id',
-        'movie_id',
-        'watched',
-        'progress'
-    ];
+protected   $table = 'watchlist';
+    protected $fillable = ['user_id', 'movie_id', 'watched'];
 
     public function user()
     {

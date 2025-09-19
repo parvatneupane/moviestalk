@@ -339,13 +339,14 @@ header {
             border: none;
         }
 
+        
         .movie-info {
             flex: 1;
         }
 
         .movie-title {
             font-size: 3.5rem;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
             background: linear-gradient(90deg, #ffffff 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -370,12 +371,32 @@ header {
             color: var(--accent);
         }
 
-        .movie-actions {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
+                    .movie-actions button {
+                        background-color: #1f1f1f; /* default dark theme */
+                        color: #fff;
+                        border: 1px solid #333;
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        margin-bottom: 5px;
+                    }
+
+                    .movie-actions button:hover {
+                        background-color: #ff4d85; /* accent hover */
+                        border-color: #ff4d85;
+                        color: #fff;
+                    }
+
+                    /* Button state when already in watchlist */
+                    .movie-actions button.in-watchlist {
+                   background-color: #28a745; /* greenish */
+                    border-color: #28a745;
+                    color: #fff;
+                    }
+
 
         .movie-description {
             font-size: 1.1rem;

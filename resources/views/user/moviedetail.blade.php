@@ -27,7 +27,44 @@
             </div>
 
             <div class="movie-info">
+                
+                    
                 <h1 class="movie-title">{{ $movie->title }}</h1>
+               
+                    <div class="movie-actions">
+                        @auth 
+                            <button id="watchlist-btn" data-movie="{{ $movie->id }}" class="{{ auth()->user()->watchlist->contains('movie_id', $movie->id) ? 'in-watchlist' : '' }}">
+                                {{ auth()->user()->watchlist->contains('movie_id', $movie->id) ? 'Added to Watchlist' : ' + Add to Watchlist' }}
+                            </button>
+                        @endauth          
+                    </div>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const btn = document.getElementById('watchlist-btn');
+                    btn.addEventListener('click', async function() {
+                        const movieId = this.dataset.movie;
+                        const token = '{{ csrf_token() }}';
+
+                        const res = await fetch(`/watchlist/toggle/${movieId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token,
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        const data = await res.json();
+                        if(data.status === 'added') {
+                            btn.textContent = 'Added to Watchlist';
+                            btn.classList.add('in-watchlist'); // change color
+                        } else if(data.status === 'removed') {
+                            btn.textContent = ' + Add to Watchlist';
+                            btn.classList.remove('in-watchlist'); // revert color
+                        }
+                    });
+                });
+                </script>
+
                 <div class="movie-meta">
                     <span><i class="fas fa-star"></i> {{ number_format($movie->rating, 1) }}</span>
                     <span><i class="fas fa-clock"></i> {{ $movie->runtime ?? 'N/A' }}</span>
@@ -35,30 +72,6 @@
                     <span><i class="fas fa-film"></i> {{ $movie->category->name ?? 'N/A' }}</span>
                 </div>
 
-                <div class="movie-actions">
-                   @auth
-    @if($inWatchlist)
-        <form action="{{ route('movie.remove-watchlist', $movie->id) }}" method="POST" style="display:inline-block;">
-            @csrf
-            <button type="submit" class="btn btn-watchlist remove">
-                <i class="fas fa-times"></i> Remove from Watchlist
-            </button>
-        </form>
-    @else
-        <form action="{{ route('movie.toggle-watchlist', $movie->id) }}" method="POST" style="display:inline-block;">
-            @csrf
-            <button type="submit" class="btn btn-watchlist">
-                <i class="fas fa-plus"></i> Add to Watchlist
-            </button>
-        </form>
-    @endif
-@else
-    <a href="{{ route('user.login.form') }}" class="btn btn-watchlist">
-        <i class="fas fa-plus"></i> Add to Watchlist
-    </a>
-@endauth
-
-                </div>
 
                 <p class="movie-description">{{ $movie->description }}</p>
             </div>

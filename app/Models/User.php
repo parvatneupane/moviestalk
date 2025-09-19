@@ -17,7 +17,8 @@ class User extends Authenticatable
         'password' => 'hashed' ,'role'
     ];
 
-    public function watchlist() {
+public function watchlist()
+{
     return $this->hasMany(Watchlist::class);
 }
 
