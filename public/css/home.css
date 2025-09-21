@@ -303,6 +303,8 @@ button.added {
     color: var(--text-primary);
 }
 
+
+
 .slide-content h2 {
     font-size: 3rem;
     margin-bottom: 15px;
@@ -503,15 +505,12 @@ button.added {
 }
 
 .card-description {
-    color: var(--text-secondary);
-    margin-bottom: 15px;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
     overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
+
+
 
 .card-actions {
     display: flex;
