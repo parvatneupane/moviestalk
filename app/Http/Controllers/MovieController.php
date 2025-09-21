@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Movie;
 use App\Models\Category;
 use App\Models\Rating;
+use App\Models\User;
+use App\Notifications\MovieAddedNotification;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Review;
 use App\Models\Watchlist;
 use Illuminate\Http\Request;
@@ -221,7 +224,11 @@ $movie->is_featured = $request->has('is_featured');
 $movie->is_trending = $request->has('is_trending');
 
     $movie->save();
-
+// Notify all users about the new movie
+    $users = User::all(); // or filter users as needed
+    foreach ($users as $user) {
+        $user->notify(new MovieAddedNotification($movie));
+    }
     return redirect('/admin/movies')->with('success', 'Movie added successfully!');
 }
 
@@ -279,7 +286,7 @@ public function update(Request $request, $id)
     $movie->production     = $request->production;
     $movie->category_id    = $request->category;
     $movie->cast           = $request->cast;
-    $movie->trailer_url    = $request->trailer;   // ✅ matches table column
+    $movie->trailer_url    = $request->trailer;   
     $movie->release_year   = $request->release_year;
     $movie->is_featured    = $request->has('is_featured');
     $movie->is_trending    = $request->has('is_trending');
@@ -378,7 +385,7 @@ public function rating($id, Request $request)
     // Get updated average rating
     $averageRating = Rating::where('movie_id', $id)->avg('rating');
 
-    // ✅ Update movies table with the average
+   
     \DB::table('movies')
         ->where('id', $id)
         ->update(['rating' => round($averageRating, 1)]);

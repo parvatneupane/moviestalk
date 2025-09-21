@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Watchlist;
 use App\Models\Movie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class WatchlistController extends Controller
 {

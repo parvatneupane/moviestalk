@@ -39,14 +39,14 @@
                             </a>
 
                             @auth
-                            <form action="{{ route('mylist.add', $movie->id) }}" method="POST" class="add-watchlist-form inline-block">
-                                @csrf
-                                <button type="submit" class="btn btn-secondary add-watchlist">
-                                    <i class="fas fa-plus"></i> Add to Watchlist
-                                </button>
-                            </form>
+            <form action="{{ route('mylist.add', $movie->id) }}" method="POST" class="ajax-watchlist-form">
+  @csrf
+  <button type="submit" class="btn btn-secondary add-watchlist">
+    <i class="fas fa-plus"></i> Add to Watchlist
+  </button>
+</form>
 
-                                                        @else
+         @else
                                 <a href="{{ route('user.login.form') }}" class="btn btn-secondary add-watchlist">
                                     <i class="fas fa-plus"></i> Add to Watchlist
                                 </a>

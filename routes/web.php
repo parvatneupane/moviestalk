@@ -83,16 +83,18 @@ Route::post('/movies/{movieId}/review/update', [MovieController::class, 'updateR
 
 
 
-
+Route::post('/admin/notifications/mark-as-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('admin.notifications.markAsRead');
 
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/mylist', [MyListController::class, 'index'])->name('mylist');
-        Route::post('/watchlist/toggle/{movieId}', [WatchlistController::class, 'toggle'])->name('watchlist.toggle');
+    
+    Route::post('/watchlist/toggle/{movieId}', [WatchlistController::class, 'toggle'])->name('watchlist.toggle');
     Route::post('/watchlist/mark/{id}', [WatchlistController::class, 'markWatched'])->name('watchlist.mark');
     Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
-    Route::post('/mylist/add/{movie}', [WatchlistController::class, 'add'])->name('mylist.add');
-
+    
+    // Use {movieId} here to match your controller
+    Route::post('/mylist/add/{movieId}', [WatchlistController::class, 'add'])->name('mylist.add');
 });
 
 
@@ -109,6 +111,12 @@ Route::get('/genres', [CategoryController::class, 'viewgenres']);
 
 });
 
+use App\Http\Controllers\Admin\NotificationController;
+Route::delete('/admin/notifications/{id}', [NotificationController::class, 'destroy'])
+    ->name('admin.notifications.destroy');
+
+Route::post('/admin/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])
+    ->name('admin.notifications.markAsRead');
 
 //crud user
 Route::prefix('admin')->as('admin.')->group(function () {

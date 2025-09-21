@@ -6,6 +6,7 @@
     <title>MovieTalk Admin</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
 
     {{-- Include extra styles from child views --}}
     @stack('styles')
@@ -75,6 +76,32 @@
             transition: background 0.3s;
             border-radius: 4px;
         }
+.alert {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.notifications-container {
+    margin-bottom: 20px;
+}
+
+.user-menu {
+    margin-top: 20px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #555;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
 
         .menu-item i {
             margin-right: 10px;
@@ -144,8 +171,7 @@
                 <h2><i class="fas fa-film"></i> <span>MovieTalk</span></h2>
                 <button class="menu-toggle"><i class="fas fa-bars"></i></button>
             </div>
-            
-          
+
             <div class="sidebar-menu">
                 <div class="menu-label">Main Navigation</div>
                 <a href="{{ url('/admin/dashboard') }}" class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
@@ -192,6 +218,7 @@
             @yield('content')
         </main>
     </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     {{-- Include extra scripts from child views --}}
     @stack('scripts')
@@ -206,5 +233,9 @@
             });
         });
     </script>
+
+
+
 </body>
+
 </html>

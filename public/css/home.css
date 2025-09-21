@@ -153,6 +153,12 @@ header {
 .nav-links li a.active::after {
     width: 100%;
 }
+button.added {
+  background-color: #28a745;
+  border-color: #28a745;
+  cursor: default;
+  color: #fff;
+}
 
 .nav-links li a.active {
     color: var(--accent);

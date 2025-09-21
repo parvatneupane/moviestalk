@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
-
+use App\Notifications\NewUserRegistered;
 class UserController extends Controller
 {
     // Show Login Form
@@ -77,12 +77,19 @@ public function login(Request $request)
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-
+            
         if ($user) {
-            return redirect()->route('user.login.form')->with('success', 'Registration successful! Please login.');
-        } else {
-            return back()->with('error', 'Something went wrong. Please try again.');
+        // Notify admin(s)
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewUserRegistered($user));
         }
+
+        return redirect()->route('user.login.form')->with('success', 'Registration successful! Please login.');
+    } else {
+        return back()->with('error', 'Something went wrong. Please try again.');
+    }
+
     }
 
    

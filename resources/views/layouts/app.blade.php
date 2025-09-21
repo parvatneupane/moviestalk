@@ -7,8 +7,8 @@
     <title>@yield('title', 'MovieTalks')</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
- <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @stack('styles')
 <style>
@@ -20,6 +20,7 @@
     --accent: #ff2a6d;
     --accent-hover: #ff4d85;
     --secondary: #05d9e8;
+    --primary: #3498db; /* Added missing variable */
     --text-primary: #ffffff;
     --text-secondary: #b3b3cc;
     --border: #2a2a3a;
@@ -200,6 +201,70 @@ header {
     font-size: 1rem;
 }
 
+/* Notification Styles */
+.notification-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.notification-icon {
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 8px;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.notification-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 10px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 1000;
+    min-width: 250px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.notification-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
 
 /* User dropdown */
 .user-dropdown {
@@ -267,7 +332,16 @@ header {
     background: var(--accent);
 }
 
+.auth-links a {
+    padding: 8px 16px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+}
 
+.auth-links a:hover {
+    background: var(--accent);
+}
 
 footer {
     background: var(--darker-bg);
@@ -460,189 +534,191 @@ footer {
     .footer-content {
         grid-template-columns: 1fr;
     }
+    
+    .notification-dropdown {
+        right: -50px;
+        min-width: 200px;
+    }
 }
 
+.profile-container {
+    display: flex;
+    gap: 30px;
+    margin: 40px auto;
+    flex-wrap: wrap;
+}
 
+.profile-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    flex: 1;
+    min-width: 300px;
+    transition: transform 0.3s ease;
+}
 
- .profile-container {
-            display: flex;
-            gap: 30px;
-            margin: 40px auto;
-            flex-wrap: wrap;
-        }
-        
-        .profile-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            flex: 1;
-            min-width: 300px;
-            transition: transform 0.3s ease;
-        }
-        
-        .profile-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .profile-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 20px;
-            border: 3px solid var(--primary);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .user-info h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .user-info p {
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-        
-        .badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--accent) 0%, #c0392b 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .profile-details {
-            margin: 25px 0;
-        }
-        
-        .detail-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background 0.3s ease;
-        }
-        
-        .detail-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .detail-item i {
-            width: 24px;
-            color: var(--primary);
-            margin-right: 15px;
-            font-size: 18px;
-        }
+.profile-card:hover {
+    transform: translateY(-5px);
+}
 
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-         .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            font-size: 16px;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
-        }
-        
-        .btn {
-            padding: 14px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn i {
-            margin-right: 8px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #2980b9 100%);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #2980b9 0%, var(--primary) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Tabs */
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 25px;
-        }
-        
-        .tab {
-            padding: 12px 25px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            color: var(--text-secondary);
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .tab:hover {
-            color: var(--text-primary);
-        }
-        
-        .tab.active {
-            border-bottom-color: var(--primary);
-            color: var(--primary);
-        }
-        
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+.avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    border: 3px solid var(--primary);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.user-info h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.user-info p {
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent) 0%, #c0392b 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.profile-details {
+    margin: 25px 0;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+.detail-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.detail-item i {
+    width: 24px;
+    color: var(--primary);
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
+
+.btn {
+    padding: 14px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn i {
+    margin-right: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #2980b9 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2980b9 0%, var(--primary) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 25px;
+}
+
+.tab {
+    padding: 12px 25px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    color: var(--text-primary);
+}
+
+.tab.active {
+    border-bottom-color: var(--primary);
+    color: var(--primary);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 
 </head>
@@ -666,29 +742,55 @@ footer {
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search movies..." id="search-input" />
                 </div>
-              
-          @auth
-        <div class="user-dropdown">
-        <button class="user-icon">
-            <i class="fas fa-user"></i>
-        </button>
-        <div class="dropdown-content">
-            <a href="{{ route('profile') }}">Profile</a>
-            <a href="{{ route('mylist') }}">My Watchlist</a>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit">Logout</button>
-            </form>
-        </div>
-    </div>
-@else
-    <div class="auth-links">
-        <a href="{{ route('user.login.form') }}">Login</a>
-      
-    </div>
-@endauth
-                 
-                </div>    
+                
+                <div class="d-flex align-items-center">
+                    @if(auth()->check())
+                    <div class="notification-wrapper">
+                        <!-- Notification Icon -->
+                        <span class="notification-icon"><i class="fas fa-bell" style="color: white;"></i></span>
+
+                        
+                        <!-- Badge with count -->
+                        <span class="notification-badge">
+                            {{ auth()->user()->unreadNotifications->count() }}
+                        </span>
+                        
+                        <!-- Dropdown -->
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            @foreach(auth()->user()->unreadNotifications as $notification)
+                                <div class="notification-item">{{ $notification->data['message'] }}</div>
+                            @endforeach
+                            @if(auth()->user()->unreadNotifications->isEmpty())
+                                <div class="notification-item">No new notifications</div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                    
+                    @auth
+                    <div class="user-dropdown">
+                        <button class="user-icon p-0 overflow-hidden border-0">
+                            <img src="{{ auth()->user()->avatar 
+                                ? asset('storage/' . auth()->user()->avatar) 
+                                : asset('images/default-avatar.png') }}" 
+                                alt="User Avatar"
+                                style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="{{ route('profile') }}">Profile</a>
+                            <a href="{{ route('mylist') }}">My Watchlist</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                    @else
+                    <div class="auth-links">
+                        <a href="{{ route('user.login.form') }}">Login</a>
+                    </div>
+                    @endauth
+                </div>
             </nav>
         </div>
     </header>
@@ -779,6 +881,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // === Notification Dropdown Toggle ===
+    const notificationIcon = document.querySelector('.notification-icon');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+
+    if (notificationIcon && notificationDropdown) {
+        notificationIcon.addEventListener('click', function (e) {
+            e.stopPropagation();
+            notificationDropdown.style.display = 
+                notificationDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!notificationIcon.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.style.display = 'none';
+            }
+        });
+    }
+
     // === Mobile Menu Toggle ===
     const mobileBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
@@ -796,5 +916,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-
-      
+</body>
+</html>
