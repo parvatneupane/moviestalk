@@ -8,7 +8,10 @@
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ $item->movie->title }}</h5>
                     <p class="card-text">{{ Str::limit($item->movie->description, 80) }}</p>
-                    <p class="small text-muted">{{ $item->movie->release_year }} • {{ $item->movie->category->name }}</p>
+                    <p class="small text-muted">
+                        {{ $item->movie->release_year }} • 
+                        {{ $item->movie->categories->pluck('name')->join(', ') }}
+                    </p>
 
                     <div class="mt-auto d-flex justify-content-between gap-2">
                         <!-- Mark/Unmark Watched -->

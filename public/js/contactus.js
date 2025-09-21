@@ -77,30 +77,40 @@
          * Contact form submission handling
          * Processes form data and shows confirmation
          */
-        function initContactForm() {
-            const contactForm = document.getElementById('contactForm');
-            
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    // Get form values
-                    const name = document.getElementById('name').value;
-                    const email = document.getElementById('email').value;
-                    const subject = document.getElementById('subject').value;
-                    const message = document.getElementById('message').value;
-                    
-                    // In a real implementation, you would send this data to a server
-                    // For this example, we'll just show a success message
-                    
-                    // Show success notification
-                    showNotification('Thank you for your message! We will get back to you soon.');
-                    
-                    // Reset form
-                    contactForm.reset();
-                });
-            }
-        }
+function initContactForm() {
+    const contactForm = document.getElementById('contactForm');
+
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(contactForm);
+
+            fetch(contactForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                showNotification(data.success || 'Your feedback has been submitted successfully!');
+                contactForm.reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Something went wrong. Please try again later.');
+            });
+        });
+    }
+}
 
         /**
          * Search functionality

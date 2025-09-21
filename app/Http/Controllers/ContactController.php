@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
+use App\Models\Feedback;
 
 class ContactController extends Controller
 {
@@ -32,18 +33,54 @@ class ContactController extends Controller
         return view('contact', compact('faqs'));
     }
     
-    public function submit(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'subject' => 'nullable|string|max:255',
-            'message' => 'required|string'
-        ]);
-        
-        // Send email
-        Mail::to('bhandarishiva318@gmail.com');
-        
-        return redirect()->back()->with('success', 'Your message has been sent successfully!');
+public function submitFeedback(Request $request)
+{
+   
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'subject' => 'nullable|string|max:255',
+        'message' => 'required|string',
+    ]);
+
+    Feedback::create([
+        'user_id' => auth()->id(),
+        'name' => $request->name,
+        'email' => $request->email,
+        'subject' => $request->subject,
+        'message' => $request->message,
+    ]);
+
+    if($request->wantsJson()){
+        return response()->json(['success' => 'Your feedback has been submitted successfully!']);
     }
+
+    return redirect()->back()->with('success', 'Your feedback has been submitted successfully!');
+}
+
+public function viewfeedbacks()
+{
+    // Get latest feedbacks with user relationship
+    $feedbacks = \App\Models\Feedback::with('user')->latest()->paginate(10);
+
+    return view('admin.adminblade.feedback', compact('feedbacks'));
+}
+
+//delete feedback
+public function deleteFeedback($id)
+{
+    $feedback = \App\Models\Feedback::findOrFail($id);
+    $feedback->delete();
+
+    return redirect()->back()->with('success', 'Feedback deleted successfully.');
+}
+
+public function viewSingleFeedback($id)
+{
+    $feedback = \App\Models\Feedback::with('user')->findOrFail($id);
+    return view('admin.adminblade.feedbackview', compact('feedback'));
+}
+
+
 }

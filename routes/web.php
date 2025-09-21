@@ -16,7 +16,7 @@ use App\Http\Controllers\WatchlistController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
+
 // Add this alias outside of prefix group
 Route::get('/login', [UserController::class, 'loginForm'])->name('login');
 Route::get('user/movies', [MovieController::class, 'index'])->name('movies');
@@ -109,6 +109,7 @@ Route::get('/addmovies', [MovieController::class, 'addshow']);
 Route::get('/genres', [CategoryController::class, 'viewgenres']);
 
 
+
 });
 
 use App\Http\Controllers\Admin\NotificationController;
@@ -163,4 +164,18 @@ Route::middleware('auth')->group(function(){
     Route::post('/movies/{movie}/submit-review', [ReviewController::class, 'submitReview'])
          ->name('movie.submit-review');
 });
+
+Route::post('/feedback-submit', [ContactController::class, 'submitFeedback'])
+     ->middleware('auth')
+     ->name('contact.submit');
+
+
+
+Route::prefix('admin')->as('admin.')->group(function () {
+    Route::get('/feedbacks', [ContactController::class, 'viewfeedbacks'])->name('feedbacks');
+    Route::get('/feedbacks/{id}', [ContactController::class, 'viewSingleFeedback'])->name('feedback.view');
+    Route::delete('/deletefeedbacks/{id}', [ContactController::class, 'deleteFeedback'])->name('feedback.delete');
+});
+
+
 

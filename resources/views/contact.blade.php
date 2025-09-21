@@ -68,33 +68,45 @@
                         </div>
                     </div>
                     
-                   
-                    <div class="contact-form">
-                        <form id="contactForm" action="{{ route('contact.submit') }}" method="POST">
-                            @csrf
-                            <div class="form-group">
-                                <label for="name">Your Name</label>
-                                <input type="text" id="name" name="name" class="form-control" placeholder="Enter your name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="subject">Subject</label>
-                                <input type="text" id="subject" name="subject" class="form-control" placeholder="What is this regarding?">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="message">Your Message</label>
-                                <textarea id="message" name="message" class="form-control" placeholder="Type your message here..." required></textarea>
-                            </div>
-                            
-                            <button type="submit" class="btn-primary submit-btn">Send Message</button>
-                        </form>
-                    </div>
+@auth
+    <div class="contact-form">
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
+        <form id="contactForm" action="{{ route('contact.submit') }}" method="POST">
+            @csrf
+
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" class="form-control" 
+                       value="{{ auth()->user()->name }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" 
+                       value="{{ auth()->user()->email }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" class="form-control" placeholder="What is this regarding?">
+            </div>
+
+            <div class="form-group">
+                <label for="message">Your Message</label>
+                <textarea id="message" name="message" class="form-control" placeholder="Type your message here..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary submit-btn">Send Message</button>
+        </form>
+    </div>
+@else
+    <p>Please <a href="{{ route('login') }}">login</a> to submit feedback.</p>
+@endauth
+
+
                 </div>
             </div>
             
@@ -125,4 +137,6 @@
 
 @push('scripts')
 <script src="{{asset('js/contactus.js')}}"></script>
+
+
 @endpush
