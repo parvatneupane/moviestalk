@@ -10,10 +10,10 @@
         <div class="movie-hero-content">
        
             <div class="movie-trailer">
-                @if($movie->trailer_url)
-                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+                @if($movie->youtube_id)
+                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
                     <iframe 
-                        src="https://www.youtube.com/embed/{{ \Illuminate\Support\Str::after($movie->trailer_url, 'v=') }}" 
+                        src="https://www.youtube.com/embed/{{ $movie->youtube_id }}" 
                         title="{{ $movie->title }} Official Trailer" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen 
@@ -21,9 +21,9 @@
                     </iframe>
                 </div>
                 @else
-                
-                 <img src="{{ asset($movie->poster) }}" alt="{{ $movie->title }} poster">
+                <img src="{{ asset($movie->poster) }}" alt="{{ $movie->title }} poster">
                 @endif
+
             </div>
 
             <div class="movie-info">
@@ -69,7 +69,17 @@
                     <span><i class="fas fa-star"></i> {{ number_format($movie->rating, 1) }}</span>
                     <span><i class="fas fa-clock"></i> {{ $movie->runtime ?? 'N/A' }}</span>
                     <span><i class="fas fa-calendar-alt"></i> {{ $movie->release_date ?? 'N/A' }}</span>
-                    <span><i class="fas fa-film"></i> {{ $movie->category->name ?? 'N/A' }}</span>
+                   
+                   <span><i class="fas fa-film"></i> 
+                        @if($movie->categories->count())
+                            {{ $movie->categories->pluck('name')->join(', ') }}
+                        @else
+                            N/A
+                        @endif
+                    </span>
+
+
+
                 </div>
 
 
@@ -83,7 +93,20 @@
                 <div class="detail-item"><span class="detail-label">Director:</span> <span class="detail-value">{{ $movie->director ?? 'N/A' }}</span></div>
                 <div class="detail-item"><span class="detail-label">Writers:</span> <span class="detail-value">{{ $movie->writer ?? 'N/A' }}</span></div>
                 <div class="detail-item"><span class="detail-label">Stars:</span> <span class="detail-value">{{ $movie->cast ?? 'N/A' }}</span></div>
-                <div class="detail-item"><span class="detail-label">Genres:</span> <span class="detail-value">{{ $movie->genres ?? $movie->category->name }}</span></div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Genres:</span> 
+                    <span class="detail-value">
+                        @if($movie->categories->count())
+                            {{ $movie->categories->pluck('name')->join(', ') }}
+                        @else
+                            N/A
+                        @endif
+                    </span>
+                </div>
+
+
+
                 <div class="detail-item"><span class="detail-label">Release Date:</span> <span class="detail-value">{{ $movie->release_date ?? 'N/A' }}</span></div>
                 <div class="detail-item"><span class="detail-label">Production:</span> <span class="detail-value">{{ $movie->production ?? 'N/A' }}</span></div>
             </div>

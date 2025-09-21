@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
+
     protected $table = 'categories'; 
     protected $fillable = ['name', 'slug'];
 
+    // 🔹 Many-to-many relationship with movies
     public function movies()
     {
-        return $this->hasMany(Movie::class);
+        return $this->belongsToMany(Movie::class, 'category_movie');
     }
 }

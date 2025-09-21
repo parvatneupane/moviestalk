@@ -21,52 +21,53 @@ class MovieController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\View\View
      */
-    public function index(Request $request)
-    {
-        $query = Movie::with('category');
+ public function index(Request $request)
+{
+    $query = Movie::with('categories'); // ✅ many-to-many relation
 
-        // Filter by category
-      if ($request->has('category') && $request->category != 'all') {
-    $query->where('category_id', $request->category);
+// Filter by category
+if ($request->has('category') && $request->category != 'all') {
+    $query->whereHas('categories', function($q) use ($request) {
+        $q->where('categories.id', $request->category); // table name fixed
+    });
 }
 
-        
-
-        // Filter by year
-        if ($request->has('year') && $request->year != 'all') {
-            $query->where('release_year', $request->year);
-        }
-
-        // Filter by rating
-        if ($request->has('rating') && $request->rating != 'all') {
-            $query->where('rating', '>=', $request->rating);
-        }
-
-        // Sort results
-        if ($request->has('sort')) {
-            switch ($request->sort) {
-                case 'rating':
-                    $query->orderBy('rating', 'desc');
-                    break;
-                case 'newest':
-                    $query->orderBy('release_year', 'desc');
-                    break;
-                case 'title':
-                    $query->orderBy('title', 'asc');
-                    break;
-                default:
-                    $query->orderBy('created_at', 'desc');
-            }
-        } else {
-            $query->orderBy('created_at', 'desc');
-        }
-
-        $movies = $query->paginate(12);
-        $categories = Category::all();
-        $years = Movie::select('release_year')->distinct()->orderBy('release_year', 'desc')->get();
-
-        return view('user.movie', compact('movies', 'categories', 'years'));
+    // Filter by year
+    if ($request->has('year') && $request->year != 'all') {
+        $query->where('release_year', $request->year);
     }
+
+    // Filter by rating
+    if ($request->has('rating') && $request->rating != 'all') {
+        $query->where('rating', '>=', $request->rating);
+    }
+
+    // Sort results
+    if ($request->has('sort')) {
+        switch ($request->sort) {
+            case 'rating':
+                $query->orderBy('rating', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('release_year', 'desc');
+                break;
+            case 'title':
+                $query->orderBy('title', 'asc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+        }
+    } else {
+        $query->orderBy('created_at', 'desc');
+    }
+
+    $movies = $query->paginate(12);
+    $categories = Category::all();
+    $years = Movie::select('release_year')->distinct()->orderBy('release_year', 'desc')->get();
+
+    return view('user.movie', compact('movies', 'categories', 'years'));
+}
+
 
     /**
      * Show the movie details page.
@@ -170,7 +171,7 @@ public function moviesdata()
 //this is backend addmovies 
 public function insertmovies(Request $request)
 {
-     // 1. Validation
+    // 1. Validation
     $request->validate([
         'title'          => 'required|string|max:255',
         'description'    => 'required|string',
@@ -181,14 +182,15 @@ public function insertmovies(Request $request)
         'writer'         => 'nullable|string|max:255',
         'production'     => 'nullable|string|max:255',          
         'cast'           => 'nullable|string',
-        'poster'         => 'required|image|mimes:jpg,jpeg,png|max:2048', // poster must be image
-        'trailer'        => 'nullable|url',
+        'poster'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048', 
+        'trailer_url'    => 'nullable|url',  
         'release_year'   => 'nullable|integer',
-        'category'    => 'required',
+        'category'       => 'required|array',
+        'category.*'     => 'exists:categories,id'
     ]);
-     $movie = new Movie;
 
-    // 2. Assign fields
+    // 2. Create movie
+    $movie = new Movie();
     $movie->title          = $request->title;
     $movie->description    = $request->description;
     $movie->release_date   = $request->release_date;
@@ -197,40 +199,35 @@ public function insertmovies(Request $request)
     $movie->content_rating = $request->content_rating;
     $movie->writer         = $request->writer;
     $movie->production     = $request->production;
+    $movie->cast           = $request->cast;
+    $movie->trailer_url    = $request->trailer_url; // ✅ use trailer_url
+    $movie->release_year   = $request->release_year;
+    $movie->is_featured    = $request->has('is_featured');
+    $movie->is_trending    = $request->has('is_trending');
 
-    // store genres as comma separated
-    $movie->category_id =  $request->category; // if you are mapping to categories
-
-    $movie->cast = $request->cast;
-
-    // 3. Poster file upload
+    // 3. Poster upload
     if ($request->hasFile('poster')) {
-
-    // Delete old poster if it exists and isn't default/fallback image
-    if ($movie->poster && Storage::disk('public')->exists($movie->poster)) {
-        Storage::disk('public')->delete($movie->poster);
+        $posterPath = $request->file('poster')->store('posters', 'public');
+        $movie->poster = $posterPath;
     }
 
-    // Store new poster
-    $posterPath = $request->file('poster')->store('posters', 'public');
-
-    // Save new path
-    $movie->poster = $posterPath;  // Just "posters/filename.jpg"
-}
-
-    $movie->trailer_url  = $request->trailer;
-    $movie->release_year = $request->release_year;
-$movie->is_featured = $request->has('is_featured');
-$movie->is_trending = $request->has('is_trending');
-
+    // 4. Save movie
     $movie->save();
-// Notify all users about the new movie
-    $users = User::all(); // or filter users as needed
+
+    // 5. Attach categories
+    if (!empty($request->category)) {
+        $movie->categories()->attach($request->category);
+    }
+
+    // 6. Notify users
+    $users = User::all();
     foreach ($users as $user) {
         $user->notify(new MovieAddedNotification($movie));
     }
+
     return redirect('/admin/movies')->with('success', 'Movie added successfully!');
 }
+
 
 
 public function addshow(){
@@ -264,18 +261,19 @@ public function update(Request $request, $id)
         'director'       => 'nullable|string|max:255',
         'content_rating' => 'nullable|string|max:50',
         'writer'         => 'nullable|string|max:255',
-        'production'     => 'nullable|string|max:255',
+        'production'     => 'nullable|string|max:255',          
         'cast'           => 'nullable|string',
-        'poster'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // optional
-        'trailer'        => 'nullable|url',
+        'poster'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048', 
+        'trailer'        => 'nullable|url',  
         'release_year'   => 'nullable|integer',
-        'category'       => 'required|integer',
+        'category'       => 'required|array',
+        'category.*'     => 'exists:categories,id'
     ]);
 
-    // 2. Find existing movie
+    // 2. Find movie
     $movie = Movie::findOrFail($id);
 
-    // 3. Assign fields
+    // 3. Update movie details
     $movie->title          = $request->title;
     $movie->description    = $request->description;
     $movie->release_date   = $request->release_date;
@@ -284,30 +282,34 @@ public function update(Request $request, $id)
     $movie->content_rating = $request->content_rating;
     $movie->writer         = $request->writer;
     $movie->production     = $request->production;
-    $movie->category_id    = $request->category;
     $movie->cast           = $request->cast;
-    $movie->trailer_url    = $request->trailer;   
+    $movie->trailer_url    = $request->trailer; // update trailer URL
     $movie->release_year   = $request->release_year;
     $movie->is_featured    = $request->has('is_featured');
     $movie->is_trending    = $request->has('is_trending');
 
-    // 4. Poster upload (optional)
+    // 4. Handle poster upload
     if ($request->hasFile('poster')) {
         // Delete old poster if exists
         if ($movie->poster && Storage::disk('public')->exists($movie->poster)) {
             Storage::disk('public')->delete($movie->poster);
         }
-
         // Store new poster
         $posterPath = $request->file('poster')->store('posters', 'public');
         $movie->poster = $posterPath;
     }
 
-    // 5. Save changes
+    // 5. Save movie
     $movie->save();
+
+    // 6. Sync categories (detach old ones and attach new ones)
+    if (!empty($request->category)) {
+        $movie->categories()->sync($request->category);
+    }
 
     return redirect('/admin/movies')->with('success', 'Movie updated successfully!');
 }
+
 
 
 // delete movies
@@ -325,36 +327,39 @@ public function destroy($id)
 // Show reviews for a specific movie 
 
 
-  public function show($movieId)
+public function show($movieId)
 {
-    // Get the movie details
-    $movie = Movie::with('category')->findOrFail($movieId);
+    // Load movie with categories, reviews, and ratings
+    $movie = Movie::with('categories', 'reviews.user', 'ratings')->findOrFail($movieId);
 
     // Get the user's previous rating (if any)
-    $userrating = Rating::where('movie_id', $movie->id)
-                        ->where('user_id', auth()->id())
-                        ->value('rating');
+    $userrating = null;
+    if (auth()->check()) {
+        $userrating = Rating::where('movie_id', $movie->id)
+                            ->where('user_id', auth()->id())
+                            ->value('rating');
+    }
 
-    // Get reviews for this movie with user relation
-    $reviews = Review::with('user')
-                     ->where('movie_id', $movieId)
-                     ->latest()
-                     ->get();
+    // Get reviews for this movie
+    $reviews = $movie->reviews()->with('user')->latest()->get();
 
-    // Calculate average rating for the movie
-    $rating = Rating::where('movie_id', $movieId)->avg('rating');
+    // Calculate average rating
+    $rating = $movie->ratings()->avg('rating');
 
-    // Get similar movies based on the same category
-    $similarMovies = Movie::where('category_id', $movie->category_id)
-                          ->where('id', '!=', $movieId)
-                          ->orderBy('rating', 'desc')
-                          ->take(4)
-                          ->get();
+    // Get similar movies based on shared categories
+    $categoryIds = $movie->categories->pluck('id');
+    $similarMovies = Movie::whereHas('categories', function($q) use ($categoryIds) {
+                                $q->whereIn('categories.id', $categoryIds);
+                            })
+                            ->where('id', '!=', $movieId)
+                            ->with('categories')
+                            ->take(4)
+                            ->get();
 
     // Check if the movie is in the user's watchlist
     $inWatchlist = false;
-    if (Auth::check()) {
-        $inWatchlist = Watchlist::where('user_id', Auth::id())
+    if (auth()->check()) {
+        $inWatchlist = Watchlist::where('user_id', auth()->id())
                                 ->where('movie_id', $movieId)
                                 ->exists();
     }

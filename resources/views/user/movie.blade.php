@@ -31,12 +31,15 @@
                         <!-- Genre Filter -->
                         <div class="filter-group">
                             <label for="genre">Genre</label>
-                            <select name="category" id="genre" class="filter-select">
-    <option value="all" {{ request('category') == 'all' ? 'selected' : '' }}>All Genres</option>
-    @foreach($categories as $category)
-        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-    @endforeach
-</select>
+                                <select name="category" id="genre" class="filter-select">
+                                    <option value="all" {{ request('category') == 'all' ? 'selected' : '' }}>All Genres</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
 
                         </div>
 
@@ -92,7 +95,13 @@
                         <div class="card-content">
                             <h3 class="card-title">{{ $movie->title }}</h3>
                             <div class="card-meta">
-                                <span>{{ $movie->release_year }} • {{ $movie->category->name }}</span>
+
+                               <span>{{ $movie->release_year }} • 
+                                    @foreach($movie->categories as $cat)
+                                        {{ $cat->name }}@if(!$loop->last), @endif
+                                    @endforeach
+                                </span>
+
                                 <span class="card-rating">
                                     <i class="fas fa-star"></i> {{ number_format($movie->rating, 1) }}
                                 </span>
