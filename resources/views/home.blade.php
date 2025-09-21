@@ -2,13 +2,16 @@
 
 @section('title', 'Home - MovieTalks')
 
+@push('styles')
 <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+@endpush
+
 
 @section('content')
-    <!-- Video Slider Section -->
+  
     <section class="video-slider-container" aria-label="Featured movie trailers">
         @foreach($featuredMovies as $movie)
-            <div class="video-slide {{ $loop->first ? 'active' : '' }}">
+        <div class="video-slide {{ $loop->first ? 'active' : '' }}">
                 @if($movie->trailer_url)
                     <iframe 
                         src="https://www.youtube.com/embed/{{ \Illuminate\Support\Str::after($movie->trailer_url, 'v=') }}?autoplay=1&mute=1" 
@@ -23,7 +26,6 @@
                         <p>No trailer available</p>
                     </div>
                 @endif
-
                 <div class="slide-content">
                     <div class="container">
                         <h2>{{ $movie->title }}</h2>

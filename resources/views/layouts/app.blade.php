@@ -20,7 +20,7 @@
     --accent: #ff2a6d;
     --accent-hover: #ff4d85;
     --secondary: #05d9e8;
-    --primary: #3498db; /* Added missing variable */
+    --primary: #3498db;
     --text-primary: #ffffff;
     --text-secondary: #b3b3cc;
     --border: #2a2a3a;
@@ -119,6 +119,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 20px 0;
+    position: relative;
 }
 
 .logo {
@@ -128,6 +129,7 @@ header {
     font-size: 28px;
     font-weight: 700;
     color: var(--text-primary);
+    z-index: 1001;
 }
 
 .logo span {
@@ -199,6 +201,42 @@ header {
 .search-bar i {
     color: var(--text-secondary);
     font-size: 1rem;
+}
+
+/* Mobile menu button */
+.mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.mobile-menu-btn span {
+    width: 25px;
+    height: 3px;
+    background: var(--text-primary);
+    margin: 2px 0;
+    transition: var(--transition);
+    border-radius: 2px;
+}
+
+.mobile-menu-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.mobile-menu-btn.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-btn.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
 }
 
 /* Notification Styles */
@@ -466,7 +504,7 @@ footer {
     }
     
     .mobile-menu-btn {
-        display: block;
+        display: flex;
     }
     
     .video-slider-container {
@@ -508,6 +546,47 @@ footer {
         align-items: flex-start;
         gap: 20px;
     }
+    
+    /* Mobile menu styles */
+    .nav-links.mobile-open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 80px);
+        background: var(--darker-bg);
+        padding: 30px;
+        z-index: 999;
+        overflow-y: auto;
+        gap: 20px;
+    }
+    
+    .search-bar.mobile-open {
+        display: flex;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        padding: 15px;
+        background: var(--dark-bg);
+        border-radius: 0;
+        z-index: 999;
+    }
+    
+    .user-actions.mobile-open {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px;
+        background: var(--card-bg);
+        justify-content: center;
+        z-index: 999;
+        border-top: 1px solid var(--border);
+    }
 }
 
 @media (max-width: 600px) {
@@ -538,6 +617,14 @@ footer {
     .notification-dropdown {
         right: -50px;
         min-width: 200px;
+    }
+    
+    .logo {
+        font-size: 22px;
+    }
+    
+    .logo i {
+        font-size: 26px;
     }
 }
 
@@ -743,7 +830,7 @@ footer {
                     <input type="text" placeholder="Search movies..." id="search-input" />
                 </div>
                 
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center user-actions">
                     @if(auth()->check())
                     <div class="notification-wrapper">
                         <!-- Notification Icon -->
@@ -760,9 +847,12 @@ footer {
                             @foreach(auth()->user()->unreadNotifications as $notification)
                                 <div class="notification-item">{{ $notification->data['message'] }}</div>
                             @endforeach
-                            @if(auth()->user()->unreadNotifications->isEmpty())
-                                <div class="notification-item">No new notifications</div>
-                            @endif
+                           @if(auth()->user()->unreadNotifications->isNotEmpty())
+    <i class="fas fa-trash-alt delete-notification" style="color: red; cursor: pointer;" title="Delete"></i>
+@endif
+
+
+
                         </div>
                     </div>
                     @endif
@@ -791,6 +881,13 @@ footer {
                     </div>
                     @endauth
                 </div>
+                
+                <!-- Mobile menu button -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </nav>
         </div>
     </header>
@@ -864,6 +961,40 @@ footer {
 
     <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // === Mobile Menu Toggle ===
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.querySelector('.nav-links');
+    const searchBar = document.querySelector('.search-bar');
+    const userActions = document.querySelector('.user-actions');
+    
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', function () {
+            this.classList.toggle('active');
+            navLinks.classList.toggle('mobile-open');
+            searchBar.classList.toggle('mobile-open');
+            userActions.classList.toggle('mobile-open');
+            
+            // Prevent body scrolling when mobile menu is open
+            if (navLinks.classList.contains('mobile-open')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close mobile menu when clicking on links
+        const navItems = navLinks.querySelectorAll('a');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                mobileMenuBtn.classList.remove('active');
+                navLinks.classList.remove('mobile-open');
+                searchBar.classList.remove('mobile-open');
+                userActions.classList.remove('mobile-open');
+                document.body.style.overflow = 'auto';
+            });
+        });
+    }
+
     // === User Dropdown Toggle ===
     const userIconBtn = document.querySelector('.user-icon');
     const dropdown = document.querySelector('.dropdown-content');
@@ -899,21 +1030,25 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // === Mobile Menu Toggle ===
-    const mobileBtn = document.querySelector('.mobile-menu-btn');
-    const navLinks = document.querySelector('.nav-links');
-
-    if (mobileBtn && navLinks) {
-        mobileBtn.addEventListener('click', function () {
-            navLinks.classList.toggle('open');
-        });
-
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('open');
-            });
-        });
-    }
+    // Close dropdowns on window resize (to handle mobile/desktop transitions)
+    window.addEventListener('resize', function() {
+        if (dropdown && dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+        }
+        
+        if (notificationDropdown && notificationDropdown.style.display === 'block') {
+            notificationDropdown.style.display = 'none';
+        }
+        
+        // Close mobile menu if window is resized to larger screen
+        if (window.innerWidth > 900) {
+            if (mobileMenuBtn) mobileMenuBtn.classList.remove('active');
+            if (navLinks) navLinks.classList.remove('mobile-open');
+            if (searchBar) searchBar.classList.remove('mobile-open');
+            if (userActions) userActions.classList.remove('mobile-open');
+            document.body.style.overflow = 'auto';
+        }
+    });
 });
 </script>
 </body>

@@ -129,6 +129,8 @@ Route::get('/deleteusers/{id}', [UserController::class, 'destroy'])->name('users
 
 });
 
+Route::post('/notifications/clear', [NotificationController::class, 'clear'])->name('notifications.clear');
+
 
 //crud movie
 Route::prefix('admin')->as('admin.')->group(function () {

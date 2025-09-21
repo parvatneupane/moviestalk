@@ -1,33 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // -------------------
-    // Slider Functionality
-    // -------------------
-    const slides = document.querySelectorAll('.video-slide');
-    const dots = document.querySelectorAll('.slider-dot');
-    const prevArrow = document.querySelector('.arrow.prev');
-    const nextArrow = document.querySelector('.arrow.next');
-    let currentSlide = 0;
-
-    function showSlide(index) {
-        slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-        currentSlide = index;
-    }
-
-    dots.forEach(dot => {
-        dot.addEventListener('click', () => showSlide(parseInt(dot.dataset.slide)));
-        dot.addEventListener('keypress', e => { if (e.key === 'Enter') showSlide(parseInt(dot.dataset.slide)); });
-    });
-
-    prevArrow.addEventListener('click', () => showSlide((currentSlide - 1 + slides.length) % slides.length));
-    nextArrow.addEventListener('click', () => showSlide((currentSlide + 1) % slides.length));
-
-    prevArrow.addEventListener('keypress', e => { if (e.key === 'Enter') showSlide((currentSlide - 1 + slides.length) % slides.length); });
-    nextArrow.addEventListener('keypress', e => { if (e.key === 'Enter') showSlide((currentSlide + 1) % slides.length); });
-
-    // -------------------
+   
+ 
     // Watchlist Functionality
-    // -------------------
+   
     const watchlistForms = document.querySelectorAll('form.add-watchlist-form');
 
     watchlistForms.forEach(form => {
@@ -100,5 +75,35 @@ document.addEventListener('DOMContentLoaded', function () {
             modalVideo.pause();
             modalVideo.src = '';
         }
+    });
+});
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const slides = document.querySelectorAll('.video-slide');
+
+    slides.forEach(slide => {
+        const videoId = slide.getAttribute('data-video-id');
+        const thumbnail = slide.querySelector('.video-thumbnail');
+        const iframeContainer = slide.querySelector('.video-iframe-container');
+        const iframe = slide.querySelector('.video-iframe');
+
+        if (!videoId || !iframe || !thumbnail) return;
+
+        slide.addEventListener('mouseenter', () => {
+            // Set iframe src only on hover
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`;
+            thumbnail.style.display = 'none';
+            iframeContainer.style.display = 'block';
+        });
+
+        slide.addEventListener('mouseleave', () => {
+            // Remove iframe to stop video and restore image
+            iframe.src = '';
+            thumbnail.style.display = 'block';
+            iframeContainer.style.display = 'none';
+        });
     });
 });

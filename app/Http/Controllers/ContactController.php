@@ -32,18 +32,24 @@ class ContactController extends Controller
         return view('contact', compact('faqs'));
     }
     
-    public function submit(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'subject' => 'nullable|string|max:255',
-            'message' => 'required|string'
-        ]);
-        
-        // Send email
-        Mail::to('bhandarishiva318@gmail.com');
-        
-        return redirect()->back()->with('success', 'Your message has been sent successfully!');
-    }
+
+
+
+public function submit(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+        'subject' => 'nullable|string|max:255',
+        'message' => 'required|string'
+    ]);
+
+ 
+    Mail::to('bhandarishiva318@gmail.com');
+
+    
+
+    return redirect()->back()->with('success', 'Your message has been sent successfully!');
+}
+
 }
