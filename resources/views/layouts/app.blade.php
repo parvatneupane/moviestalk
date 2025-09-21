@@ -754,16 +754,25 @@ footer {
                         <span class="notification-badge">
                             {{ auth()->user()->unreadNotifications->count() }}
                         </span>
-                        
-                        <!-- Dropdown -->
-                        <div class="notification-dropdown" id="notificationDropdown">
-                            @foreach(auth()->user()->unreadNotifications as $notification)
-                                <div class="notification-item">{{ $notification->data['message'] }}</div>
-                            @endforeach
-                            @if(auth()->user()->unreadNotifications->isEmpty())
-                                <div class="notification-item">No new notifications</div>
-                            @endif
-                        </div>
+                                        
+    <div class="notification-dropdown" id="notificationDropdown">
+        @foreach(auth()->user()->notifications()->latest()->get() as $notification)
+            <div class="notification-item notification-link {{ is_null($notification->read_at) ? 'unread' : 'read' }}"
+                data-reply-id="{{ $notification->data['feedback_id'] ?? '' }}"
+                data-notification-id="{{ $notification->id }}">
+                {{ $notification->data['message'] }}
+            </div>
+        @endforeach
+
+        @if(auth()->user()->notifications->isEmpty())
+            <div class="notification-item">No notifications</div>
+        @endif
+    </div>
+
+
+
+
+
                     </div>
                     @endif
                     
@@ -862,59 +871,125 @@ footer {
 
     @stack('scripts')
 
-    <script>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
-    // === User Dropdown Toggle ===
-    const userIconBtn = document.querySelector('.user-icon');
-    const dropdown = document.querySelector('.dropdown-content');
 
-    if (userIconBtn && dropdown) {
-        userIconBtn.addEventListener('click', function (e) {
+    // === USER DROPDOWN ===
+    const userBtn = document.querySelector('.user-icon');
+    const userDropdown = document.querySelector('.dropdown-content');
+
+    if (userBtn && userDropdown) {
+        userBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            dropdown.classList.toggle('show');
+            userDropdown.classList.toggle('show');
         });
 
-        document.addEventListener('click', function (e) {
-            if (!dropdown.contains(e.target) && !userIconBtn.contains(e.target)) {
-                dropdown.classList.remove('show');
+        document.addEventListener('click', function(e) {
+            if (!userDropdown.contains(e.target) && !userBtn.contains(e.target)) {
+                userDropdown.classList.remove('show');
             }
         });
     }
 
-    // === Notification Dropdown Toggle ===
+    // === NOTIFICATION DROPDOWN ===
     const notificationIcon = document.querySelector('.notification-icon');
     const notificationDropdown = document.getElementById('notificationDropdown');
 
     if (notificationIcon && notificationDropdown) {
-        notificationIcon.addEventListener('click', function (e) {
+        notificationIcon.addEventListener('click', function(e) {
             e.stopPropagation();
             notificationDropdown.style.display = 
                 notificationDropdown.style.display === 'block' ? 'none' : 'block';
         });
 
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             if (!notificationIcon.contains(e.target) && !notificationDropdown.contains(e.target)) {
                 notificationDropdown.style.display = 'none';
             }
         });
     }
 
-    // === Mobile Menu Toggle ===
-    const mobileBtn = document.querySelector('.mobile-menu-btn');
-    const navLinks = document.querySelector('.nav-links');
+    // === OPEN FEEDBACK REPLY MODAL ===
+    document.querySelectorAll('.notification-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const feedbackId = this.dataset.replyId;
+            if (!feedbackId) return;
 
-    if (mobileBtn && navLinks) {
-        mobileBtn.addEventListener('click', function () {
-            navLinks.classList.toggle('open');
-        });
+            // Fetch feedback reply HTML
+            fetch(`/feedback-reply/${feedbackId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.text())
+            .then(html => {
 
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('open');
+                // Create modal overlay
+                const modal = document.createElement('div');
+                modal.classList.add('reply-modal');
+                Object.assign(modal.style, {
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(0,0,0,0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 9999,
+                });
+
+                // Create modal content wrapper
+                const contentWrapper = document.createElement('div');
+                contentWrapper.innerHTML = html;
+                Object.assign(contentWrapper.style, {
+                    background: '#161626',
+                    padding: '30px',
+                    borderRadius: '10px',
+                    maxWidth: '600px',
+                    width: '90%',
+                    maxHeight: '80%',
+                    overflowY: 'auto',
+                    position: 'relative'
+                });
+
+                // Add cross button
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = '×';
+                Object.assign(closeBtn.style, {
+                    position: 'absolute',
+                    top: '10px',
+                    right: '15px',
+                    fontSize: '24px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#fff',
+                    cursor: 'pointer'
+                });
+                closeBtn.addEventListener('click', () => modal.remove());
+                contentWrapper.appendChild(closeBtn);
+
+                // Append content to modal
+                modal.appendChild(contentWrapper);
+                document.body.appendChild(modal);
+
+                // Close modal when clicking overlay
+                modal.addEventListener('click', e => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+
             });
         });
-    }
+    });
+
 });
 </script>
+
+
+
+
+
 </body>
 </html>

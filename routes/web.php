@@ -175,7 +175,10 @@ Route::prefix('admin')->as('admin.')->group(function () {
     Route::get('/feedbacks', [ContactController::class, 'viewfeedbacks'])->name('feedbacks');
     Route::get('/feedbacks/{id}', [ContactController::class, 'viewSingleFeedback'])->name('feedback.view');
     Route::delete('/deletefeedbacks/{id}', [ContactController::class, 'deleteFeedback'])->name('feedback.delete');
+    Route::post('/feedback/{id}/reply', [ContactController::class, 'replyFeedback'])->name('feedback.reply');
 });
+
+Route::get('/feedback-reply/{feedback}', [ContactController::class, 'showFeedbackReply']);
 
 
 

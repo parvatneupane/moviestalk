@@ -25,10 +25,18 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function markAsRead()
-    {
-        auth()->user()->unreadNotifications->markAsRead();
+public function markAsRead(Request $request)
+{
+    $request->validate([
+        'notification_id' => 'required|exists:notifications,id',
+    ]);
 
-        return response()->json(['status' => 'success']);
+    $notification = auth()->user()->notifications()->find($request->notification_id);
+    if($notification){
+        $notification->markAsRead(); // ✅ Marks as read, does NOT delete
     }
+
+    return response()->json(['success' => true]);
+}
+
 }

@@ -83,4 +83,39 @@ public function viewSingleFeedback($id)
 }
 
 
+
+//reply feedback
+public function replyFeedback(Request $request, $feedbackId)
+{
+    $request->validate([
+        'reply' => 'required|string|max:2000',
+    ]);
+
+    $feedback = \App\Models\Feedback::findOrFail($feedbackId);
+
+        $reply = $feedback->replies()->create([
+            'user_id' => auth()->id(), // admin
+            'reply' => $request->reply,
+            'is_admin' => 1,           // ⚠️ mark as admin
+        ]);
+
+
+    // Notify **only the user who submitted the feedback**
+$feedback->user->notify(new \App\Notifications\FeedbackRepliedNotification($reply));
+
+    return response()->json(['success' => 'Reply sent successfully!']);
+}
+
+public function showFeedbackReply($feedbackId)
+{
+    $feedback = \App\Models\Feedback::findOrFail($feedbackId);
+
+    // Get the latest admin reply
+    $reply = $feedback->replies()->where('is_admin', 1)->latest()->first();
+
+    return view('user.feedback_reply_popup', compact('reply'));
+}
+
+
+
 }
