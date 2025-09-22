@@ -200,6 +200,11 @@
                     <span>Genres</span>
                 </a>
 
+                     <a href="{{ url('/admin/feedbacks') }}" class="menu-item {{ request()->is('admin/feedbacks') ? 'active' : '' }}">
+                    <i class="fas fa-message"></i>
+                    <span>Feedbacks</span>
+                </a>
+
                 <div class="menu-label">System</div>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf

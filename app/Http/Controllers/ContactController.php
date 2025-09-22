@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
+use App\Models\Feedback;
 
 class ContactController extends Controller
 {
@@ -32,24 +33,97 @@ class ContactController extends Controller
         return view('contact', compact('faqs'));
     }
     
-
-
-
-public function submit(Request $request)
+public function submitFeedback(Request $request)
 {
-    $validated = $request->validate([
+   
+
+    $request->validate([
         'name' => 'required|string|max:255',
-        'email' => 'required|email',
+        'email' => 'required|email|max:255',
         'subject' => 'nullable|string|max:255',
-        'message' => 'required|string'
+        'message' => 'required|string',
     ]);
 
- 
-    Mail::to('bhandarishiva318@gmail.com');
+    Feedback::create([
+        'user_id' => auth()->id(),
+        'name' => $request->name,
+        'email' => $request->email,
+        'subject' => $request->subject,
+        'message' => $request->message,
+    ]);
 
-    
+    if($request->wantsJson()){
+        return response()->json(['success' => 'Your feedback has been submitted successfully!']);
+    }
 
-    return redirect()->back()->with('success', 'Your message has been sent successfully!');
+    return redirect()->back()->with('success', 'Your feedback has been submitted successfully!');
 }
+
+public function viewfeedbacks()
+{
+    // Get latest feedbacks with user relationship
+    $feedbacks = \App\Models\Feedback::with('user')->latest()->paginate(10);
+
+    return view('admin.adminblade.feedback', compact('feedbacks'));
+}
+
+//delete feedback
+public function deleteFeedback($id)
+{
+    $feedback = \App\Models\Feedback::findOrFail($id);
+    $feedback->delete();
+
+    return redirect()->back()->with('success', 'Feedback deleted successfully.');
+}
+
+public function viewSingleFeedback($id)
+{
+    $feedback = \App\Models\Feedback::with('user')->findOrFail($id);
+    return view('admin.adminblade.feedbackview', compact('feedback'));
+}
+
+
+
+//reply feedback
+public function replyFeedback(Request $request, $feedbackId)
+{
+    $request->validate([
+        'reply' => 'required|string|max:2000',
+    ]);
+
+    $feedback = \App\Models\Feedback::findOrFail($feedbackId);
+
+    // Keep this line (important!)
+    $reply = $feedback->replies()->create([
+        'user_id' => auth()->id(), // admin
+        'reply'   => $request->reply,
+        'is_admin'=> 1,            // mark as admin
+    ]);
+
+    // Optionally update feedback status for admin panel
+    $feedback->update([
+        'status' => 'replied',
+    ]);
+
+    // Notify the user
+    if ($feedback->user) {
+        $feedback->user->notify(new \App\Notifications\FeedbackRepliedNotification($reply));
+    }
+
+    return response()->json(['success' => 'Reply sent successfully!']);
+}
+
+
+public function showFeedbackReply($feedbackId)
+{
+    $feedback = \App\Models\Feedback::findOrFail($feedbackId);
+
+    // Get the latest admin reply
+    $reply = $feedback->replies()->where('is_admin', 1)->latest()->first();
+
+    return view('user.feedback_reply_popup', compact('reply'));
+}
+
+
 
 }
