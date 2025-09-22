@@ -430,6 +430,16 @@ header {
         }
 
         /* ========== RATING SECTION ========== */
+        #rating-dashboard {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(36, 34, 34, 0.3);
+            width: 48%;
+        }
+        #rating-dashboard:hover {
+            transform: scale(1.03);
+        }
         .rating-section {
             padding: 40px 0 20px;
         }
@@ -498,10 +508,11 @@ header {
         }
 
         .user-rating {
+            margin-top: 12px;
             background: var(--card-bg);
             border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(36, 34, 34, 0.3);
             width: 48%;
         }
         .user-rating:hover {

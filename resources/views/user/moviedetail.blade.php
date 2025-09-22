@@ -149,12 +149,14 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const stars = document.querySelectorAll('.star-rating label i');
     const radios = document.querySelectorAll('.star-rating input');
 
+    // Function to fill stars visually
     function fillStars(rating) {
         stars.forEach((star, index) => {
             star.classList.toggle('filled', index < rating);
@@ -165,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkedRadio = document.querySelector('.star-rating input:checked');
     if (checkedRadio) fillStars(parseInt(checkedRadio.value));
 
+    // Hover & click events
     stars.forEach((star, index) => {
         const radio = radios[index];
 
@@ -210,10 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                // Update user stars instantly
+                // 1️⃣ Update user stars
                 fillStars(parseInt(data.rating));
 
-                // Update average rating visually
+                // 2️⃣ Update average rating stars & value
                 const avgRatingContainer = document.getElementById('average-rating');
                 const avg = parseFloat(data.averageRating);
 
@@ -230,7 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 starsHtml += ` <span class="average-rating">${avg.toFixed(1)}/5</span>`;
                 avgRatingContainer.innerHTML = starsHtml;
 
-                // SweetAlert dark theme popup
+                // 3️⃣ Dynamically refresh the chart
+                if (window.refreshRatingChart) {
+                    window.refreshRatingChart();
+                }
+
+                // 4️⃣ SweetAlert popup
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
@@ -270,24 +278,136 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-
     </div>
 
-    <!-- Display Average Rating -->
-<div class="rating-stars mt-3" id="average-rating">
-    @for ($i = 1; $i <= 5; $i++)
-        @if ($i <= floor($rating))
-            <i class="fas fa-star"></i>
-        @elseif ($i - 0.5 <= $rating)
-            <i class="fas fa-star-half-alt"></i>
-        @else
-            <i class="far fa-star"></i>
-        @endif
-    @endfor
-    <span class="average-rating">{{ number_format($rating, 1) }}/5</span>
+<div class="rating-dashboard d-flex gap-4 align-items-start mt-3" id="rating-dashboard">
+    <!-- Average Rating Stars -->
+    <div class="average-rating-stars text-center">
+        <div id="average-rating">
+            @for ($i = 1; $i <= 5; $i++)
+                @if ($i <= floor($rating))
+                    <i class="fas fa-star"></i>
+                @elseif ($i - 0.5 <= $rating)
+                    <i class="fas fa-star-half-alt"></i>
+                @else
+                    <i class="far fa-star"></i>
+                @endif
+            @endfor
+            <div>{{ number_format($rating, 1) }}/5</div>
+        </div>
+        <div id="review-count" style="color: #ffffff;">0 Ratings</div>
+    </div>
+
+    <!-- Review Distribution Chart -->
+    <div class="rating-chart" style="flex:1;">
+        <canvas id="reviewChart" height="150"></canvas>
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+let reviewChart;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('reviewChart').getContext('2d');
+
+    // Initialize empty chart
+    reviewChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+            datasets: [{
+                label: 'Number of Ratings',
+                data: [0,0,0,0,0],
+                backgroundColor: ['#f44336','#ff9800','#ffeb3b','#8bc34a','#4caf50']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Ratings Distribution' }
+            },
+            scales: { 
+                y: { beginAtZero: true, ticks: { stepSize: 1, precision:0 } } 
+            }
+        }
+    });
+
+    // Fetch latest rating counts and update chart
+    function refreshRatingChart() {
+        fetch("{{ route('movies.ratingCounts', $movie->id) }}")
+            .then(res => res.json())
+            .then(data => {
+                // Update chart
+                reviewChart.data.datasets[0].data = [
+                    data[1] ?? 0,
+                    data[2] ?? 0,
+                    data[3] ?? 0,
+                    data[4] ?? 0,
+                    data[5] ?? 0
+                ];
+                reviewChart.update();
+
+                // Calculate total ratings and average
+                let totalRatings = 0, sum = 0;
+                for (let i=1; i<=5; i++){
+                    const count = data[i] ?? 0;
+                    totalRatings += count;
+                    sum += count * i;
+                }
+                const avg = totalRatings > 0 ? sum / totalRatings : 0;
+
+                // Update average rating stars
+                const avgStars = document.querySelectorAll('#average-rating i');
+                avgStars.forEach((star, index) => {
+                    star.className = index < Math.floor(avg) ? 'fas fa-star' :
+                                     (index - 0.5 < avg ? 'fas fa-star-half-alt' : 'far fa-star');
+                });
+
+                // Update average rating value
+                document.querySelector('#average-rating div').textContent = avg.toFixed(1) + '/5';
+
+                // Update total rating count
+                const countEl = document.getElementById('review-count');
+                countEl.textContent = totalRatings + ' Ratings';
+                countEl.style.color = '#ffffff';
+            })
+            .catch(err => console.error(err));
+    }
+
+    // Initial chart load
+    refreshRatingChart();
+
+    // Expose globally to refresh after rating submit
+    window.refreshRatingChart = refreshRatingChart;
+});
+</script>
+
+
+
+
+
+<style>
+    .rating-dashboard {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.average-rating-stars {
+    text-align: center;
+}
+
+.average-rating-stars i {
+    color: #f5b301;
+    font-size: 1.2rem;
+    margin-right: 2px;
+}
+
+</style>
 
 </div>
 @endauth
@@ -399,8 +519,10 @@ function submitReview(review, update){
     <p>Please <a href="{{ route('user.login.form') }}">login</a> to write a review.</p>
     @endauth
 
- 
+
    <div class="reviews-list mt-4">
+            <div id="review-count" style="color: #ffffff;">{{ $reviews->count() }} Reviews</div>
+
     @forelse($reviews as $review)
         <div class="review-card border p-3 mb-3 rounded d-flex gap-3 align-items-start">
         
@@ -414,7 +536,7 @@ function submitReview(review, update){
             <div class="flex-grow-1">
                 <div class="review-header mb-1 d-flex justify-content-between align-items-center">
                     <strong>{{ $review->user->name }}</strong>
-                    <span class="text-muted" style="font-size: 0.85rem;">{{ $review->created_at->format('F j, Y') }}</span>
+                    <span  style="font-size: 0.85rem;">{{ $review->created_at->format('F j, Y') }}</span>
                 </div>
                 <div class="review-content">
                     <p class="mb-0">{{ $review->review }}</p>

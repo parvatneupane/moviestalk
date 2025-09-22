@@ -346,6 +346,12 @@ public function show($movieId)
     // Calculate average rating
     $rating = $movie->ratings()->avg('rating');
 
+    // Prepare review counts per star for chart
+    $reviewCounts = [];
+    for ($i = 1; $i <= 5; $i++) {
+        $reviewCounts[$i] = $movie->ratings()->where('rating', $i)->count();
+    }
+
     // Get similar movies based on shared categories
     $categoryIds = $movie->categories->pluck('id');
     $similarMovies = Movie::whereHas('categories', function($q) use ($categoryIds) {
@@ -364,7 +370,21 @@ public function show($movieId)
                                 ->exists();
     }
 
-    return view('user.moviedetail', compact('movie', 'reviews', 'similarMovies', 'rating', 'inWatchlist', 'userrating'));
+    return view('user.moviedetail', compact(
+        'movie', 'reviews', 'similarMovies', 'rating', 'inWatchlist', 'userrating', 'reviewCounts'
+    ));
+}
+// Add this to MovieController
+public function ratingCounts($movieId)
+{
+    $movie = Movie::findOrFail($movieId);
+
+    $ratingCounts = [];
+    for ($i = 1; $i <= 5; $i++) {
+        $ratingCounts[$i] = $movie->ratings()->where('rating', $i)->count();
+    }
+
+    return response()->json($ratingCounts);
 }
 
 

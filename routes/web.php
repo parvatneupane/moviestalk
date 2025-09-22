@@ -22,6 +22,10 @@ Route::get('/login', [UserController::class, 'loginForm'])->name('login');
 Route::get('user/movies', [MovieController::class, 'index'])->name('movies');
 Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.search');
 Route::get('user/movie/{movieId}', [MovieController::class, 'show'])->name('movie.detail');
+// routes/web.php
+Route::get('/movies/{movie}/rating-counts', [MovieController::class, 'ratingCounts'])
+    ->name('movies.ratingCounts');
+
 Route::prefix('user')->group(function () {
   
     Route::get('/login', [UserController::class, 'loginForm'])->name('user.login.form');
