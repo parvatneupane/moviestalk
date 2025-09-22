@@ -16,11 +16,11 @@
                 <div class="menu-toggle">
                     <i class="fas fa-bars"></i>
                 </div>
-
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search feedback...">
-                </div>
+    <!-- Dashboard title -->
+            <div class="dashboard-title">
+                <h1>Feedback Management</h1>
+                <p>View and manage user feedback</p>
+            </div>
 
                 <div class="user-menu">
                     <div class="user-profile">
@@ -32,11 +32,7 @@
                 </div>
             </div>
 
-            <!-- Dashboard title -->
-            <div class="dashboard-title">
-                <h1>Feedback Management</h1>
-                <p>View and manage user feedback</p>
-            </div>
+        
 
             <!-- Stats Cards -->
             <div class="stats-container">

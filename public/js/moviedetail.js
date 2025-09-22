@@ -29,38 +29,7 @@ function toggleWatchlist(movieId) {
 }
 
 // Function to handle submitting the rating
-function submitRating(movieId) {
-    const rating = document.querySelectorAll('.star-rating i.selected').length; // Count the selected stars
 
-    if (rating === 0) {
-        alert('Please select a rating before submitting.');
-        return;
-    }
-
-    // Send the rating to the backend
-    fetch(`/movie/${movieId}/submit-rating`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token for security
-        },
-        body: JSON.stringify({ rating: rating })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Your rating has been submitted.");
-            // Optionally, update the average rating on the page without refreshing
-            document.querySelector('.rating-score').innerText = data.new_average_rating;
-        } else {
-            alert("Something went wrong. Please try again.");
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Something went wrong while submitting the rating.');
-    });
-}
 
 // Function to handle star click to select rating
 document.querySelectorAll('.star-rating i').forEach(star => {
