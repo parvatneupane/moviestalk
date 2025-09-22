@@ -2,9 +2,9 @@
 
 @section('title', 'Contact Us - MovieTalks')
 
-
+@push('styles')
 <link rel="stylesheet" href="{{ asset('css/contactus.css') }}">
-
+@endpush
 
 @section('content')
     
@@ -137,6 +137,4 @@
 
 @push('scripts')
 <script src="{{asset('js/contactus.js')}}"></script>
-
-
 @endpush

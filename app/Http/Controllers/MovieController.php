@@ -87,7 +87,7 @@ public function search(Request $request)
                        ->get();
 
         // Return a view with the search results
-        return view('user.search', compact('movies'));
+        return view('user.search', compact('movies','searchTerm'));
     }
     /**
      * Add or remove a movie from the user's watchlist.

@@ -341,6 +341,22 @@ header {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(255, 42, 109, 0.6);
 }
+.alert {
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  font-weight: 600;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.1);
+  text-align: center;
+}
+
+.alert-error {
+  background-color: #ffdddd;
+  color: #d8000c;
+  border: 1px solid #d8000c;
+}
 
 .separator {
   display: flex;

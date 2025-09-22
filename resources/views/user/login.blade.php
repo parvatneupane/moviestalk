@@ -35,10 +35,17 @@
                 </div>
 
                 <!-- Logo / App Name -->
-                <div class="logo text-center mb-3">
-                    <h3 style="font-weight: bold; color: blue;">MovieTalks</h3>
-                    @include('session') <!-- Include session flash messages -->
-                </div>
+              <div class="logo text-center mb-3">
+    <h3 style="font-weight: bold; color: blue;">MovieTalks</h3>
+
+    <!-- Error message display -->
+    @if(session('error'))
+        <div class="alert alert-error">
+            {{ session('error') }}
+        </div>
+    @endif
+</div>
+
 
                 <h2>Sign In</h2>
 
@@ -61,20 +68,14 @@
                         <label class="remember">
                             <input type="checkbox" name="remember"> Remember me
                         </label>
-                        <a href="/user/forgot-password" class="forgot-password">Forgot Password?</a>
+                        <a href="/user/rese" class="forgot-password">Forgot Password?</a>
                     </div>
 
                     <button type="submit" class="login-button">Sign In</button>
 
-                    <div class="separator">
-                        <span>Or continue with</span>
-                    </div>
+                  
 
-                    <div class="social-login">
-                        <a href="#" class="social-btn">
-                            <i class="fab fa-google"></i>
-                        </a>
-                    </div>
+                   
 
                     <div class="signup-link">
                         Don't have an account? <a href="/user/register">Sign Up Now</a>

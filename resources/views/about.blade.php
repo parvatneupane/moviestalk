@@ -2,9 +2,9 @@
 
 @section('title', 'About Us - MovieTalks')
 
-
+@push('styles')
 <link rel="stylesheet" href="{{ asset('css/aboutus.css') }}">
-
+@endpush
 
 @section('content')
   
@@ -30,33 +30,7 @@
                 </div>
             </div>
             
-        
-            <div class="about-section">
-                <div class="section-header">
-                    <h2 class="section-title">By The Numbers</h2>
-                    <p class="section-subtitle">Our impact in the movie community</p>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">{{ $stats['users'] }}+</div>
-                        <div class="stat-label">Monthly Users</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{ $stats['movies'] }}+</div>
-                        <div class="stat-label">Movies Reviewed</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{ $stats['countries'] }}+</div>
-                        <div class="stat-label">Countries Reached</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{ $stats['satisfaction'] }}%</div>
-                        <div class="stat-label">User Satisfaction</div>
-                    </div>
-                </div>
-            </div>
-            
+
             <div class="about-section">
                 <div class="section-header">
                     <h2 class="section-title">Our Team</h2>
