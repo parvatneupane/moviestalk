@@ -1,3 +1,43 @@
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.watchlist-btn');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+
+            const movieId = this.dataset.movie;
+            const token = '{{ csrf_token() }}';
+
+            try {
+                const res = await fetch(`/watchlist/toggle/${movieId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await res.json();
+
+                if(data.status === 'added') {
+                    this.textContent = 'Added to Watchlist';
+                    this.classList.add('in-watchlist');
+                } else if(data.status === 'removed') {
+                    this.textContent = ' + Add to Watchlist';
+                    this.classList.remove('in-watchlist');
+                }
+            } catch(err) {
+                console.error(err);
+                alert('Something went wrong. Please try again.');
+            }
+        });
+    });
+});
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
   /* -------------------- Video Slider -------------------- */
   const slides = document.querySelectorAll('.video-slide');
@@ -87,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeModalBtn = trailerModal.querySelector('.close-modal');
 
   // Show trailer modal and load video URL (You may trigger this from watch buttons if implemented)
+  
   // For demonstration, let's assume "Watch Now" buttons open trailer modal with the embedded video.
   document.querySelectorAll('.watch-btn').forEach(btn => {
     btn.addEventListener('click', e => {
@@ -143,50 +184,50 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* -------------------- AJAX Add to Watchlist -------------------- */
-  document.querySelectorAll('.ajax-watchlist-form').forEach(form => {
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
+//   document.querySelectorAll('.ajax-watchlist-form').forEach(form => {
+//     form.addEventListener('submit', async e => {
+//       e.preventDefault();
 
-      const button = form.querySelector('button[type="submit"]');
-      button.disabled = true;
-      button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Adding...`;
+//       const button = form.querySelector('button[type="submit"]');
+//       button.disabled = true;
+//       button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Adding...`;
 
-      try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          headers: {
-            'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({}),
-        });
+//       try {
+//         const response = await fetch(form.action, {
+//           method: 'POST',
+//           headers: {
+//             'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+//             'Accept': 'application/json',
+//             'X-Requested-With': 'XMLHttpRequest',
+//             'Content-Type': 'application/json',
+//           },
+//           body: JSON.stringify({}),
+//         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+//         if (!response.ok) {
+//           throw new Error(`HTTP error! status: ${response.status}`);
+//         }
 
-        const data = await response.json();
+//         const data = await response.json();
 
-        if (data.success) {
-          button.innerHTML = `<i class="fas fa-check"></i> Added`;
-          setTimeout(() => {
-            button.innerHTML = `<i class="fas fa-plus"></i> Add to Watchlist`;
-            button.disabled = false;
-          }, 3000);
-        } else {
-          alert(data.message || 'Failed to add to watchlist.');
-          button.disabled = false;
-          button.innerHTML = `<i class="fas fa-plus"></i> Add to Watchlist`;
-        }
-      } catch (error) {
-        alert('An error occurred. Please try again.');
-        button.disabled = false;
-        button.innerHTML = `<i class="fas fa-plus"></i> Add to Watchlist`;
-        console.error('Watchlist AJAX error:', error);
-      }
-    });
-  });
+//         if (data.success) {
+//           button.innerHTML = `<i class="fas fa-check"></i> Added`;
+//           setTimeout(() => {
+//             button.innerHTML = `<i class="fas fa-plus"></i> Add to Watchlist`;
+//             button.disabled = false;
+//           }, 3000);
+//         } else {
+//           alert(data.message || 'Failed to add to watchlist.');
+//           button.disabled = false;
+//           button.innerHTML = `<i class="fas fa-plus"></i> Add to Watchlist`;
+//         }
+//       } catch (error) {
+//         alert('An error occurred. Please try again.');
+//         button.disabled = false;
+//         button.innerHTML = `<i class="fas fa-plus"></i> Add to Watchlist`;
+//         console.error('Watchlist AJAX error:', error);
+//       }
+//     });
+//   });
 
-});
+ });

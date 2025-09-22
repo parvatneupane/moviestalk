@@ -12,15 +12,21 @@
                         {{ $item->movie->release_year }} • 
                         {{ $item->movie->categories->pluck('name')->join(', ') }}
                     </p>
-<p class="small text-muted">
-    Rating: {{ $item->movie->rating ?? 'N/A' }} ★
-</p>
+                                        <!-- Star Rating -->
+                    @php
+                        $avgRating = $item->movie->ratings()->avg('rating');
+                    @endphp
+                    <div class="movie-rating mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        <span>{{ number_format($avgRating ?? 0, 1) }}</span>
+                    </div>
 
                     <div class="mt-auto d-flex justify-content-between gap-2">
                         <!-- Mark/Unmark Watched -->
                         <form action="{{ route('watchlist.mark', $item->id) }}" method="POST" class="watchlist-mark">
                             @csrf
-                            <button type="submit" class="btn btn-dark btn-sm">
+                            <button type="submit" 
+                                    class="btn btn-dark btn-sm">
                                 {{ $item->watched ? 'Already Watched' : 'Not Watched' }}
                             </button>
                         </form>
@@ -28,7 +34,8 @@
                         <!-- Remove from Watchlist -->
                         <form action="{{ route('watchlist.toggle', $item->movie->id) }}" method="POST" class="watchlist-toggle">
                             @csrf
-                            <button type="submit" class="btn btn-dark btn-sm">
+                            <button type="submit" 
+                                    class="btn btn-dark btn-sm">
                                 Remove
                             </button>
                         </form>
@@ -42,3 +49,17 @@
         </div>
     @endforelse
 </div>
+<style>
+    .movie-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.movie-rating i {
+    color: #ffc107; /* star color */
+}
+
+</style>

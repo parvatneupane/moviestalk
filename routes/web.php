@@ -188,7 +188,8 @@ Route::prefix('admin')->as('admin.')->group(function () {
     Route::post('/feedback/{id}/reply', [ContactController::class, 'replyFeedback'])->name('feedback.reply');
 });
 
-Route::get('/feedback-reply/{feedback}', [ContactController::class, 'showFeedbackReply']);
+Route::get('/feedback-reply/{feedback}', [ContactController::class, 'showFeedbackReply'])
+    ->name('feedback.reply.show');
 
 
 

@@ -8,11 +8,11 @@
 
 @section('content')
 <section class="video-slider-container" aria-label="Featured movie trailers">
-    @foreach($featuredMovies as $movie)
+   @foreach($featuredMovies as $movie)
         <div class="video-slide {{ $loop->first ? 'active' : '' }}">
             <div class="slider-thumbnail">
                 <img src="{{ asset('storage/' . $movie->poster) }}" alt="{{ $movie->title }} poster">
-            </div>
+             </div>
 
             <div class="slide-content">
                 <div class="container">
@@ -28,23 +28,64 @@
                             <i class="fas fa-play"></i> Watch Now
                         </a>
 
+
                         @auth
-                            <form action="{{ route('mylist.add', $movie->id) }}" method="POST" class="ajax-watchlist-form">
-                                @csrf
-                                <button type="submit" class="btn btn-secondary add-watchlist">
-                                    <i class="fas fa-plus"></i> Add to Watchlist
-                                </button>
-                            </form>
+                            <button class="watchlist-btn {{ auth()->user()->watchlist->contains('movie_id', $movie->id) ? 'in-watchlist' : '' }}" 
+                                    data-movie="{{ $movie->id }}">
+                                {{ auth()->user()->watchlist->contains('movie_id', $movie->id) ? 'Added to Watchlist' : ' + Add to Watchlist' }}
+                            </button>
                         @else
                             <a href="{{ route('user.login.form') }}" class="btn btn-secondary add-watchlist">
                                 <i class="fas fa-plus"></i> Add to Watchlist
                             </a>
                         @endauth
+
                     </div>
                 </div>
             </div>
         </div>
     @endforeach
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.watchlist-btn');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+
+            const movieId = this.dataset.movie;
+            const token = '{{ csrf_token() }}';
+
+            try {
+                const res = await fetch(`/watchlist/toggle/${movieId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await res.json();
+
+                if(data.status === 'added') {
+                    this.textContent = 'Added to Watchlist';
+                    this.classList.add('in-watchlist');
+                } else if(data.status === 'removed') {
+                    this.textContent = ' + Add to Watchlist';
+                    this.classList.remove('in-watchlist');
+                }
+            } catch(err) {
+                console.error(err);
+                alert('Something went wrong. Please try again.');
+            }
+        });
+    });
+});
+
+</script>
+
+
 
     <!-- Slider Controls -->
     <div class="slider-controls">

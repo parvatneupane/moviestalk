@@ -31,10 +31,17 @@ class Movie extends Model
     ];
 
     // 🔹 Many-to-many relationship with categories
- public function categories()
-{
-    return $this->belongsToMany(Category::class, 'category_movie');
+
+public function categories() {
+    return $this->belongsToMany(Category::class, 'category_movie', 'movie_id', 'category_id');
 }
+
+// Movie.php
+public function category()
+{
+    return $this->belongsTo(Category::class, 'category_id'); // 'category_id' should match your column
+}
+
 
     public function users()
     {

@@ -425,6 +425,25 @@ header {
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
+        .contact-form .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.3); /* idle blackish */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+.contact-form .form-control:focus {
+    background: #ffffff;   /* white when typing */
+    color: #000000;        /* black text */
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+
         .form-group {
             margin-bottom: 25px;
         }

@@ -20,12 +20,15 @@ class FeedbackRepliedNotification extends Notification
         return ['database']; // store in database
     }
 
-    public function toArray($notifiable)
-    {
-        return [
-            'feedback_id' => $this->reply->feedback_id,
-            'reply_id' => $this->reply->id,
-            'message' => 'Admin replied to your feedback: ' . substr($this->reply->reply, 0, 50) . '...',
-        ];
-    }
+public function toArray($notifiable)
+{
+    return [
+        'feedback_id' => $this->reply->feedback_id,
+        'reply_id'    => $this->reply->id,
+        'message'     => 'Admin replied to your feedback: ' . substr($this->reply->reply, 0, 50) . '...',
+        'url'         => url('/feedback-reply/' . $this->reply->feedback_id), // 👈 added
+    ];
+}
+
+
 }

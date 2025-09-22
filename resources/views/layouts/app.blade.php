@@ -25,7 +25,7 @@
 
                 <ul class="nav-links">
                     <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Home</a></li>
-                    <li><a href="{{ route('movies') }}" class="{{ request()->routeIs('movies.*') ? 'active' : '' }}">Movies</a></li>
+                    <li><a href="{{ route('movies') }}" class="{{ request()->routeIs('movies') ? 'active' : '' }}">Movies</a></li>
                     <li><a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">About Us</a></li>
                     <li><a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">Contact Us</a></li>
                 </ul>
@@ -52,19 +52,73 @@
                                 {{ auth()->user()->unreadNotifications->count() }}
                             </span>
                         @endif
+<div id="notificationDropdown" class="notification-dropdown">
+    @forelse(auth()->user()->notifications as $notification)
+        <div class="notification-item" data-id="{{ $notification->data['feedback_id'] }}">
+            <a href="#" class="notification-link" data-reply-id="{{ $notification->data['feedback_id'] }}">
+                {{ $notification->data['message'] }}
+            </a>
+            <i class="fas fa-trash-alt delete-notification" title="Delete"></i>
+        </div>
+    @empty
+        <div class="notification-item" style="text-align: center; color: #999;">
+            No notifications
+        </div>
+    @endforelse
+</div>
+<script>
+    document.querySelectorAll('.notification-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const feedbackId = this.dataset.replyId;
+        if (!feedbackId) return;
 
-                        <div id="notificationDropdown" class="notification-dropdown">
-                            @forelse(auth()->user()->notifications as $notification)
-                                <div class="notification-item" data-id="{{ $notification->id }}">
-                                    <span>{{ $notification->data['message'] }}</span>
-                                    <i class="fas fa-trash-alt delete-notification" title="Delete"></i>
-                                </div>
-                            @empty
-                                <div class="notification-item" style="text-align: center; color: #999;">
-                                    No notifications
-                                </div>
-                            @endforelse
-                        </div>
+        fetch(`/feedback-reply/${feedbackId}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => res.text())
+        .then(html => {
+            // Create modal
+            const modal = document.createElement('div');
+            modal.classList.add('feedback-reply-modal');
+            modal.style.position = 'fixed';
+            modal.style.top = 0;
+            modal.style.left = 0;
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.background = 'rgba(0,0,0,0.5)';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.style.zIndex = 9999;
+
+            const contentWrapper = document.createElement('div');
+            contentWrapper.innerHTML = html;
+            contentWrapper.style.background = '#352f2f';
+            contentWrapper.style.padding = '20px';
+            contentWrapper.style.borderRadius = '8px';
+            contentWrapper.style.maxWidth = '500px';
+            contentWrapper.style.width = '90%';
+            contentWrapper.style.position = 'relative';
+
+            // Close button
+            const closeBtn = contentWrapper.querySelector('.close-modal');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => modal.remove());
+            }
+
+            modal.appendChild(contentWrapper);
+            document.body.appendChild(modal);
+
+            // Click outside to close
+            modal.addEventListener('click', e => {
+                if (!contentWrapper.contains(e.target)) modal.remove();
+            });
+        });
+    });
+});
+
+</script>
                     </div>
                     
                     <div class="user-dropdown">

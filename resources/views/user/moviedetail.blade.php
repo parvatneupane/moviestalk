@@ -552,25 +552,37 @@ function submitReview(review, update){
 
 
     <!-- Similar Movies -->
-    <section class="similar-movies">
-        <h2 class="section-title">You Might Also Like</h2>
-       <div class="movies-grid">
-    @foreach($similarMovies as $similar)
-        <div class="movie-card">
-            <a href="{{ route('movie.detail', $similar->id) }}">
-                <div class="movie-poster">
-                    <img src="{{ asset('storage/' . $similar->poster) }}" alt="{{ $similar->title }}" >
-                </div>
-                <div class="movie-info">
-                    <h3>{{ $similar->title }}</h3>
-                    <span>{{ \Carbon\Carbon::parse($similar->release_date)->format('Y-m-d') }}</span>
-                </div>
-            </a>
-        </div>
-    @endforeach
-</div>
+<section class="similar-movies">
+    <h2 class="section-title">You Might Also Like</h2>
+    <div class="movies-grid">
+        @foreach($similarMovies as $similar)
+            <div class="movie-card">
+                <a href="{{ route('movie.detail', $similar->id) }}">
+                    <div class="movie-card-poster">
+                        <img src="{{ asset('storage/' . $similar->poster) }}" alt="{{ $similar->title }}">
+                    </div>
+                    <div class="movie-card-info">
+                        <h3 class="movie-card-title">{{ $similar->title }}</h3>
+                        <div class="movie-card-meta">
+                            <span class="movie-card-year">{{ \Carbon\Carbon::parse($similar->release_date)->format('Y') }}</span> |
+                           <span class="movie-card-genre">
+                                @foreach($similar->categories as $cat)
+                                    {{ $cat->name }}@if(!$loop->last), @endif
+                                @endforeach
+                            </span>
+                        </div>
+                        <div class="movie-card-rating">
+                            <i class="fas fa-star" style="color: #ffc107;"></i>
+                            <span>{{ number_format($similar->rating ?? 0, 1) }}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        @endforeach
+    </div>
+</section>
 
-    </section>
+
 </main>
 @endsection
 
