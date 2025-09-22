@@ -212,7 +212,7 @@
 
             <div class="categories-grid">
                 @foreach($categories as $category)
-                    <a href="{{ route('movies', ['category' => $category->name]) }}" class="category-card" role="button">
+                   <a href="{{ route('movies', ['category' => $category->id]) }}" class="category-card" role="button">
                         <i class="fas fa-film" aria-hidden="true"></i>
                         <h3>{{ $category->name }}</h3>
                         <span class="count">{{ $category->movies_count }} movies</span>

@@ -118,6 +118,9 @@ Route::delete('/admin/notifications/{id}', [NotificationController::class, 'dest
 Route::post('/admin/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])
     ->name('admin.notifications.markAsRead');
 
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+
+
 //crud user
 Route::prefix('admin')->as('admin.')->group(function () {
 
@@ -130,8 +133,9 @@ Route::get('/deleteusers/{id}', [UserController::class, 'destroy'])->name('users
 });
 
 Route::post('/notifications/clear', [NotificationController::class, 'clear'])->name('notifications.clear');
+Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.delete');
 
-
+Route::post('/notifications/clear', [NotificationController::class, 'clearAll'])->name('notifications.clearAll');
 //crud movie
 Route::prefix('admin')->as('admin.')->group(function () {
 
