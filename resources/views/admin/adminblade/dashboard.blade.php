@@ -12,7 +12,7 @@
 
 
 <body>
-    <body>
+   
     <div class="container">
         <!-- Main Content -->
         <div class="main">

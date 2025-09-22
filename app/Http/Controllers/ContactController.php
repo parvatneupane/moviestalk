@@ -93,18 +93,26 @@ public function replyFeedback(Request $request, $feedbackId)
 
     $feedback = \App\Models\Feedback::findOrFail($feedbackId);
 
-        $reply = $feedback->replies()->create([
-            'user_id' => auth()->id(), // admin
-            'reply' => $request->reply,
-            'is_admin' => 1,           // ⚠️ mark as admin
-        ]);
+    // Keep this line (important!)
+    $reply = $feedback->replies()->create([
+        'user_id' => auth()->id(), // admin
+        'reply'   => $request->reply,
+        'is_admin'=> 1,            // mark as admin
+    ]);
 
+    // Optionally update feedback status for admin panel
+    $feedback->update([
+        'status' => 'replied',
+    ]);
 
-    // Notify **only the user who submitted the feedback**
-$feedback->user->notify(new \App\Notifications\FeedbackRepliedNotification($reply));
+    // Notify the user
+    if ($feedback->user) {
+        $feedback->user->notify(new \App\Notifications\FeedbackRepliedNotification($reply));
+    }
 
     return response()->json(['success' => 'Reply sent successfully!']);
 }
+
 
 public function showFeedbackReply($feedbackId)
 {

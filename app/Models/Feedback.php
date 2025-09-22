@@ -13,6 +13,8 @@ class Feedback extends Model
         'email',
         'subject',
         'message',
+        'reply',
+        'status',
     ];
 
     public function user()
