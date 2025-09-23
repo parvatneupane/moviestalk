@@ -339,11 +339,31 @@ public function show($movieId)
                 ->value('rating')
         : null;
 
-    // Get reviews for this movie with user
+    // Get all reviews for this movie (latest first)
     $reviews = $movie->reviews()->with('user')->latest()->get();
 
     // Preload all ratings keyed by user_id to avoid per-review queries
     $allRatings = $movie->ratings()->get()->keyBy('user_id');
+
+    // Split reviews: latest 3 for immediate display, rest for "See More"
+    $latestReviews = $reviews->take(3);
+    $remainingReviews = $reviews->slice(3)->map(function($review) use ($allRatings) {
+        return [
+            'id' => $review->id,
+            'review' => $review->review,
+            'created_at' => $review->created_at->toDateTimeString(),
+            'user' => [
+                'id' => $review->user->id,
+                'name' => $review->user->name,
+                'avatar' => $review->user->avatar
+                    ? asset('storage/' . $review->user->avatar)
+                    : asset('images/default-avatar.png'),
+            ],
+            'user_rating' => $allRatings->has($review->user->id)
+                ? $allRatings[$review->user->id]->rating
+                : null,
+        ];
+    })->values(); // reset keys for JSON
 
     // Calculate average rating
     $rating = $movie->ratings()->avg('rating');
@@ -371,24 +391,19 @@ public function show($movieId)
                    ->exists()
         : false;
 
-    // Prepare reviews array for JS init (to use in Show More)
-    $reviewsForJs = $reviews->map(function($review) use ($allRatings) {
-        return [
-            'user' => [
-                'id' => $review->user->id,
-                'name' => $review->user->name,
-                'avatar' => $review->user->avatar ? asset('storage/' . $review->user->avatar) : asset('images/default-avatar.png')
-            ],
-            'review' => $review->review,
-            'created_at' => $review->created_at->toDateTimeString(),
-            'user_rating' => $allRatings->has($review->user->id) ? $allRatings[$review->user->id]->rating : null
-        ];
-    });
-
     return view('user.moviedetail', compact(
-        'movie', 'reviews', 'similarMovies', 'rating', 'inWatchlist', 'userrating', 'reviewCounts', 'reviewsForJs'
+        'movie',
+        'latestReviews',
+        'remainingReviews',
+        'similarMovies',
+        'rating',
+        'inWatchlist',
+        'userrating',
+        'reviewCounts',
+        'allRatings'
     ));
 }
+
 
 // Add this to MovieController
 public function ratingCounts($movieId)
@@ -440,13 +455,16 @@ public function rating($id, Request $request)
 
 public function loadMoreReviews(Movie $movie, Request $request)
 {
-    $offset = $request->query('offset', 0);
+    $offset = (int) $request->query('offset', 0);
 
     // Load next 2 reviews with user
     $reviews = $movie->reviews()->with('user')->latest()->skip($offset)->take(2)->get();
 
-    // Return the partial with Eloquent models
-    return view('user.showmorereview', compact('reviews'))->render();
+    // Preload ratings keyed by user_id so the partial can show star ratings
+    $allRatings = $movie->ratings()->get()->keyBy('user_id');
+
+    // Return the partial (pass both reviews & allRatings)
+    return view('user.showmorereview', compact('reviews', 'allRatings'))->render();
 }
 
 
