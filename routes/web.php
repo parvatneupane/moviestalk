@@ -192,4 +192,6 @@ Route::get('/feedback-reply/{feedback}', [ContactController::class, 'showFeedbac
     ->name('feedback.reply.show');
 
 
+Route::get('/movies/{movie}/more-reviews', [MovieController::class, 'loadMoreReviews'])->name('movies.moreReviews');
+
 

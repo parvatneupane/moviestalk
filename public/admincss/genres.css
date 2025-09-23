@@ -1,0 +1,174 @@
+/* ==========================================
+   Genre Management Page Styles
+========================================== */
+
+/* Container */
+.container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Management Header */
+.management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.management-header .dashboard-title h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.management-header .dashboard-title p {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* Add Button */
+.btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #5c6bc0;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #3f51b5;
+}
+
+/* Alerts */
+.alert {
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Table */
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.user-table th,
+.user-table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.user-table thead {
+    background-color: #f5f5f5;
+}
+
+.user-table th {
+    font-weight: 600;
+    color: #34495e;
+}
+
+.user-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.3s;
+}
+
+.user-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+/* Delete Button */
+.btn-delete {
+    background-color: #e74c3c;
+    color: #fff;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    font-size: 12px;
+    border: none;
+    transition: background 0.3s;
+}
+
+.btn-delete:hover {
+    background-color: #c0392b;
+}
+
+/* Empty State */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #7f8c8d;
+}
+
+.fs-1 {
+    font-size: 48px;
+}
+
+.py-5 {
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.mt-2 {
+    margin-top: 10px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a,
+.pagination span {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 5px;
+    text-decoration: none;
+    background-color: #f5f5f5;
+    color: #34495e;
+    transition: background 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #5c6bc0;
+    color: #fff;
+}

@@ -106,6 +106,46 @@
                         <div class="stat-label">Reviews</div>
                     </div>
                 </div>
+                <h1>Quick Links</h1>
+
+<!-- Quick Links Cards -->
+<div class="stats-container" style="margin-top: 30px;">
+    <div class="stat-card">
+        <div class="stat-icon" style="background-color: rgba(92, 107, 192, 0.2); color: var(--primary);">
+            <i class="fas fa-film"></i>
+        </div>
+        <div class="stat-content">
+            <a href="{{ url('/admin/addmovies') }}" style="text-decoration: none; color: inherit;">
+                <div class="stat-value">Add Movie</div>
+            </a>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background-color: rgba(38, 166, 154, 0.2); color: var(--accent);">
+            <i class="fas fa-tags"></i>
+        </div>
+        <div class="stat-content">
+            <a href="{{ url('/admin/genres') }}" style="text-decoration: none; color: inherit;">
+                <div class="stat-value">Genres</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background-color: rgba(255, 193, 7, 0.2); color: #FFC107;">
+            <i class="fas fa-comment-alt"></i>
+        </div>
+        <div class="stat-content">
+            <a href="{{ url('/admin/feedbacks') }}" style="text-decoration: none; color: inherit;">
+                <div class="stat-value">Feedback</div>
+            </a>
+        </div>
+    </div>
+</div>
+
+
             </div>
         </div>
     </div>

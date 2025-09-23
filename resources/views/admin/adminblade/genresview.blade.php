@@ -1,8 +1,20 @@
 @extends('layouts.admin')
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieTalk Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('admincss/genres.css') }}">
+</head>
+
 @section('content')
 
-        <!-- Genre Management Header -->
+
+<body>
+   
+
+    <!-- Genre Management Header -->
         <div class="management-header">
             <div class="dashboard-title">
                 <h1>Genre Management</h1>
@@ -25,7 +37,7 @@
             <table class="user-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        
                         <th>Genre Name</th>
                         <th>Created At</th>
                         <th>Actions</th>
@@ -34,7 +46,7 @@
                 <tbody>
                     @forelse($genres as $genre)
                         <tr>
-                            <td>#{{ $genre->id }}</td>
+                          
                             <td>{{ $genre->name }}</td>
                             <td>{{ $genre->created_at->format('M d, Y') }}</td>
                             <td>

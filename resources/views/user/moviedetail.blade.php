@@ -151,12 +151,15 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
     const stars = document.querySelectorAll('.star-rating label i');
     const radios = document.querySelectorAll('.star-rating input');
 
+    // -------------------------
     // Function to fill stars visually
+    // -------------------------
     function fillStars(rating) {
         stars.forEach((star, index) => {
             star.classList.toggle('filled', index < rating);
@@ -167,7 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkedRadio = document.querySelector('.star-rating input:checked');
     if (checkedRadio) fillStars(parseInt(checkedRadio.value));
 
+    // -------------------------
     // Hover & click events
+    // -------------------------
     stars.forEach((star, index) => {
         const radio = radios[index];
 
@@ -183,7 +188,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // -------------------------
     // AJAX form submission
+    // -------------------------
     const form = document.getElementById('rating-form');
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -217,33 +224,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 fillStars(parseInt(data.rating));
 
                 // 2️⃣ Update average rating stars & value
-                const avgRatingContainer = document.getElementById('average-rating');
                 const avg = parseFloat(data.averageRating);
+                const avgRatingContainer = document.getElementById('average-rating');
 
                 let starsHtml = '';
                 for (let i = 1; i <= 5; i++) {
-                    if (i <= Math.floor(avg)) {
-                        starsHtml += '<i class="fas fa-star"></i>';
-                    } else if (i - 0.5 <= avg) {
-                        starsHtml += '<i class="fas fa-star-half-alt"></i>';
-                    } else {
-                        starsHtml += '<i class="far fa-star"></i>';
-                    }
+                    if (i <= Math.floor(avg)) starsHtml += '<i class="fas fa-star"></i>';
+                    else if (i - 0.5 <= avg) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                    else starsHtml += '<i class="far fa-star"></i>';
                 }
                 starsHtml += ` <span class="average-rating">${avg.toFixed(1)}/5</span>`;
                 avgRatingContainer.innerHTML = starsHtml;
 
-                // 3️⃣ Dynamically refresh the chart
-                if (window.refreshRatingChart) {
-                    window.refreshRatingChart();
-                }
+                // 3️⃣ Refresh total rating count dynamically
+                if (window.refreshRatingChart) window.refreshRatingChart();
 
-                // 4️⃣ SweetAlert popup
+                // 4️⃣ Success popup
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
                     text: 'Rating submitted successfully',
-                    timer: 2000,
+                    timer: 1800,
                     showConfirmButton: false,
                     background: '#2d2d2d',
                     color: '#ffffff',
@@ -253,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Something went wrong!',
+                    text: data.message || 'Something went wrong!',
                     background: '#2d2d2d',
                     color: '#ffffff',
                     iconColor: '#f44336'
@@ -265,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 icon: 'error',
                 title: 'Error!',
-                text: 'Something went wrong!',
+                text: 'Something went wrong! Please try again.',
                 background: '#2d2d2d',
                 color: '#ffffff',
                 iconColor: '#f44336'
@@ -273,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
 </script>
 
 
@@ -337,46 +339,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Fetch latest rating counts and update chart
-    function refreshRatingChart() {
-        fetch("{{ route('movies.ratingCounts', $movie->id) }}")
-            .then(res => res.json())
-            .then(data => {
-                // Update chart
-                reviewChart.data.datasets[0].data = [
-                    data[1] ?? 0,
-                    data[2] ?? 0,
-                    data[3] ?? 0,
-                    data[4] ?? 0,
-                    data[5] ?? 0
-                ];
-                reviewChart.update();
+function refreshRatingChart() {
+    fetch("{{ route('movies.ratingCounts', $movie->id) }}")
+        .then(res => res.json())
+        .then(data => {
+            // 1️⃣ Update chart bars
+            reviewChart.data.datasets[0].data = [
+                data[1] ?? 0,
+                data[2] ?? 0,
+                data[3] ?? 0,
+                data[4] ?? 0,
+                data[5] ?? 0
+            ];
+            reviewChart.update();
 
-                // Calculate total ratings and average
-                let totalRatings = 0, sum = 0;
-                for (let i=1; i<=5; i++){
-                    const count = data[i] ?? 0;
-                    totalRatings += count;
-                    sum += count * i;
-                }
-                const avg = totalRatings > 0 ? sum / totalRatings : 0;
+            // 2️⃣ Calculate total ratings
+            const totalRatings = Object.values(data).reduce((a, b) => a + b, 0);
 
-                // Update average rating stars
-                const avgStars = document.querySelectorAll('#average-rating i');
-                avgStars.forEach((star, index) => {
-                    star.className = index < Math.floor(avg) ? 'fas fa-star' :
-                                     (index - 0.5 < avg ? 'fas fa-star-half-alt' : 'far fa-star');
-                });
-
-                // Update average rating value
-                document.querySelector('#average-rating div').textContent = avg.toFixed(1) + '/5';
-
-                // Update total rating count
-                const countEl = document.getElementById('review-count');
+            // 3️⃣ Update total rating count in DOM
+            const countEl = document.getElementById('review-count');
+            if (countEl) {
                 countEl.textContent = totalRatings + ' Ratings';
                 countEl.style.color = '#ffffff';
-            })
-            .catch(err => console.error(err));
-    }
+            }
+
+            // 4️⃣ Update average rating stars dynamically
+            const sum = Object.entries(data).reduce((acc, [star, count]) => acc + star * count, 0);
+            const avg = totalRatings > 0 ? sum / totalRatings : 0;
+
+            const avgRatingContainer = document.getElementById('average-rating');
+            if (avgRatingContainer) {
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= Math.floor(avg)) starsHtml += '<i class="fas fa-star"></i>';
+                    else if (i - 0.5 <= avg) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                    else starsHtml += '<i class="far fa-star"></i>';
+                }
+                starsHtml += ` <span class="average-rating">${avg.toFixed(1)}/5</span>`;
+                avgRatingContainer.innerHTML = starsHtml;
+            }
+        })
+        .catch(err => console.error(err));
+}
 
     // Initial chart load
     refreshRatingChart();
@@ -519,34 +523,68 @@ function submitReview(review, update){
     <p>Please <a href="{{ route('user.login.form') }}">login</a> to write a review.</p>
     @endauth
 
+@php
+    $initialReviews = $movie->reviews()->latest()->take(2)->get();
+    $totalReviews = $movie->reviews()->count();
+@endphp
 
-   <div class="reviews-list mt-4">
-            <div id="review-count" style="color: #ffffff;">{{ $reviews->count() }} Reviews</div>
-
-    @forelse($reviews as $review)
-        <div class="review-card border p-3 mb-3 rounded d-flex gap-3 align-items-start">
-        
-            <img 
-  src="{{ $review->user->avatar ? asset('storage/' . $review->user->avatar) : asset('images/default-avatar.png') }}" 
-  alt="{{ $review->user->name }}'s Avatar" 
-  class="rounded-circle"
-  style="width: 50px; height: 50px; object-fit: cover;">
-
-         
-            <div class="flex-grow-1">
-                <div class="review-header mb-1 d-flex justify-content-between align-items-center">
-                    <strong>{{ $review->user->name }}</strong>
-                    <span  style="font-size: 0.85rem;">{{ $review->created_at->format('F j, Y') }}</span>
-                </div>
-                <div class="review-content">
-                    <p class="mb-0">{{ $review->review }}</p>
-                </div>
-            </div>
-        </div>
-    @empty
-        <p>No reviews yet.</p>
-    @endforelse
+<div class="movie-reviews" id="reviews-container" data-movie-id="{{ $movie->id }}" data-total="{{ $totalReviews }}">
+    @include('user.showmorereview', ['reviews' => $initialReviews])
 </div>
+
+@if($totalReviews > 2)
+    <button id="toggle-reviews-btn" class="btn btn-outline-light mt-2" data-offset="2">
+        Show More
+    </button>
+@endif
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const reviewsContainer = document.getElementById('reviews-container');
+    const toggleBtn = document.getElementById('toggle-reviews-btn');
+    if (!toggleBtn || !reviewsContainer) return;
+
+    const movieId = reviewsContainer.dataset.movieId;
+    const totalReviews = parseInt(reviewsContainer.dataset.total);
+    let offset = parseInt(toggleBtn.dataset.offset);
+    let showingAll = false;
+
+    toggleBtn.addEventListener('click', async function() {
+        if (!showingAll) {
+            // Show more: fetch next batch
+            try {
+                const res = await fetch(`/movies/${movieId}/more-reviews?offset=${offset}`);
+                const data = await res.text();
+                reviewsContainer.insertAdjacentHTML('beforeend', data);
+
+                offset += 2;
+                toggleBtn.dataset.offset = offset;
+
+                if (reviewsContainer.children.length >= totalReviews) {
+                    toggleBtn.textContent = 'Show Less';
+                    showingAll = true;
+                }
+            } catch(err) {
+                console.error(err);
+                alert('Failed to load more reviews.');
+            }
+        } else {
+            // Show less: remove extra reviews
+            const initialCount = 2;
+            const allCards = reviewsContainer.querySelectorAll('.review-card');
+            allCards.forEach((card, index) => {
+                if (index >= initialCount) card.remove();
+            });
+
+            toggleBtn.textContent = 'Show More';
+            offset = initialCount;
+            toggleBtn.dataset.offset = offset;
+            showingAll = false;
+        }
+    });
+});
+</script>
+
 
 </section>
 

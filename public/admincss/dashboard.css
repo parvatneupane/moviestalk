@@ -6,6 +6,25 @@
   --text: #333;
 }
 
+.quick-link-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--primary);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.quick-link-btn:hover {
+    background-color: #5f5fc4; /* Slightly darker shade */
+    transform: translateY(-2px);
+}
+
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
