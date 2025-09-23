@@ -53,72 +53,25 @@
                             </span>
                         @endif
 <div id="notificationDropdown" class="notification-dropdown">
-    @forelse(auth()->user()->notifications as $notification)
-        <div class="notification-item" data-id="{{ $notification->data['feedback_id'] }}">
-            <a href="#" class="notification-link" data-reply-id="{{ $notification->data['feedback_id'] }}">
-                {{ $notification->data['message'] }}
-            </a>
-            <i class="fas fa-trash-alt delete-notification" title="Delete"></i>
-        </div>
-    @empty
-        <div class="notification-item" style="text-align: center; color: #999;">
-            No notifications
-        </div>
-    @endforelse
+@forelse(auth()->user()->notifications as $notification)
+    <div class="notification-item"
+         data-id="{{ $notification->id }}"> {{-- Use notification id, NOT feedback_id --}}
+        <a href="#"
+           class="notification-link"
+           data-reply-id="{{ $notification->data['feedback_id'] ?? '' }}">
+            {{ $notification->data['message'] ?? 'No message' }}
+        </a>
+        <i class="fas fa-trash-alt delete-notification" title="Delete"></i>
+    </div>
+@empty
+    <div class="notification-item" style="text-align: center; color: #999;">
+        No notifications
+    </div>
+@endforelse
+
 </div>
-<script>
-    document.querySelectorAll('.notification-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const feedbackId = this.dataset.replyId;
-        if (!feedbackId) return;
 
-        fetch(`/feedback-reply/${feedbackId}`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(res => res.text())
-        .then(html => {
-            // Create modal
-            const modal = document.createElement('div');
-            modal.classList.add('feedback-reply-modal');
-            modal.style.position = 'fixed';
-            modal.style.top = 0;
-            modal.style.left = 0;
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.background = 'rgba(0,0,0,0.5)';
-            modal.style.display = 'flex';
-            modal.style.alignItems = 'center';
-            modal.style.justifyContent = 'center';
-            modal.style.zIndex = 9999;
 
-            const contentWrapper = document.createElement('div');
-            contentWrapper.innerHTML = html;
-            contentWrapper.style.background = '#352f2f';
-            contentWrapper.style.padding = '20px';
-            contentWrapper.style.borderRadius = '8px';
-            contentWrapper.style.maxWidth = '500px';
-            contentWrapper.style.width = '90%';
-            contentWrapper.style.position = 'relative';
-
-            // Close button
-            const closeBtn = contentWrapper.querySelector('.close-modal');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => modal.remove());
-            }
-
-            modal.appendChild(contentWrapper);
-            document.body.appendChild(modal);
-
-            // Click outside to close
-            modal.addEventListener('click', e => {
-                if (!contentWrapper.contains(e.target)) modal.remove();
-            });
-        });
-    });
-});
-
-</script>
                     </div>
                     
                     <div class="user-dropdown">
@@ -208,8 +161,9 @@
     </footer>
 
     @stack('scripts')
-    <script>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
+
     // ========================
     // Toggle Notification Dropdown
     // ========================
@@ -222,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function () {
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         });
 
-        // Hide dropdown when clicking outside
         document.addEventListener('click', function (e) {
             if (!dropdown.contains(e.target) && e.target !== bell) {
                 dropdown.style.display = 'none';
@@ -231,42 +184,85 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================
-    // Delete Individual Notifications (Optional AJAX)
+    // Open Feedback Reply Modal
+    // ========================
+    document.querySelectorAll('.notification-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const feedbackId = this.dataset.replyId;
+            if (!feedbackId) return;
+
+            fetch(`/feedback-reply/${feedbackId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.text())
+            .then(html => {
+                const modal = document.createElement('div');
+                modal.classList.add('feedback-reply-modal');
+                modal.style.position = 'fixed';
+                modal.style.top = 0;
+                modal.style.left = 0;
+                modal.style.width = '100%';
+                modal.style.height = '100%';
+                modal.style.background = 'rgba(0,0,0,0.5)';
+                modal.style.display = 'flex';
+                modal.style.alignItems = 'center';
+                modal.style.justifyContent = 'center';
+                modal.style.zIndex = 9999;
+
+                const contentWrapper = document.createElement('div');
+                contentWrapper.innerHTML = html;
+                contentWrapper.style.background = '#352f2f';
+                contentWrapper.style.padding = '20px';
+                contentWrapper.style.borderRadius = '8px';
+                contentWrapper.style.maxWidth = '500px';
+                contentWrapper.style.width = '90%';
+                contentWrapper.style.position = 'relative';
+
+                const closeBtn = contentWrapper.querySelector('.close-modal');
+                if (closeBtn) closeBtn.addEventListener('click', () => modal.remove());
+
+                modal.appendChild(contentWrapper);
+                document.body.appendChild(modal);
+
+                modal.addEventListener('click', e => {
+                    if (!contentWrapper.contains(e.target)) modal.remove();
+                });
+            });
+        });
+    });
+
+    // ========================
+    // Delete Individual Notifications (AJAX)
     // ========================
     document.querySelectorAll('.delete-notification').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // prevent opening modal
             const notificationItem = this.closest('.notification-item');
             const id = notificationItem.dataset.id;
 
-            // Optional: AJAX call to delete on the backend
+            if (!id) return;
+
             fetch(`/notifications/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Accept': 'application/json'
                 }
-            }).then(response => {
-                if (response.ok) {
-                    notificationItem.remove();
+            }).then(res => res.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      notificationItem.remove();
 
-                    // Optionally update badge count
-                    const badge = document.getElementById('notificationCount');
-                    if (badge) {
-                        const count = document.querySelectorAll('.notification-item').length;
-                        if (count <= 1) {
-                            badge.style.display = 'none';
-                        } else {
-                            badge.textContent = count - 1;
-                        }
-                    }
-                } else {
-                    alert('Failed to delete notification.');
-                }
-            }).catch(error => {
-                console.error(error);
-                alert('Error deleting notification.');
-            });
+                      // Update badge count
+                      const badge = document.getElementById('notificationCount');
+                      if (badge) {
+                          const remaining = document.querySelectorAll('.notification-item[data-id]').length;
+                          badge.style.display = remaining <= 0 ? 'none' : 'block';
+                          badge.textContent = remaining;
+                      }
+                  }
+              }).catch(err => console.error(err));
         });
     });
 
@@ -282,7 +278,6 @@ document.addEventListener('DOMContentLoaded', function () {
             dropdownContent.classList.toggle('show');
         });
 
-        // Hide dropdown when clicking outside
         document.addEventListener('click', function (e) {
             if (!dropdownContent.contains(e.target) && e.target !== userIconBtn) {
                 dropdownContent.classList.remove('show');
@@ -307,9 +302,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ========================
-    // Optional: Close mobile menu on link click
-    // ========================
+    // Close mobile menu on link click
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
             if (navLinks && navLinks.classList.contains('mobile-open')) {
@@ -320,8 +313,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
 });
 </script>
+
 </div>
 </body>
 </html>
